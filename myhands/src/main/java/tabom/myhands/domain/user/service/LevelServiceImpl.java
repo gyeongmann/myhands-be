@@ -39,6 +39,7 @@ public class LevelServiceImpl implements LevelService {
             throw new UserApiException(UserErrorCode.INVALID_LEVEL_VALUE);
         }
         return groupLevels.keySet().stream()
+                .sorted()
                 .findFirst() // 최하위 레벨 선택
                 .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_LEVEL_VALUE));
     }
