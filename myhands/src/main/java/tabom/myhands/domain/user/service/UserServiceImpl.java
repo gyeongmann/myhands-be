@@ -43,6 +43,13 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
     }
 
+    @Override
+    public void isDuplicate(String id) {
+        if (userRepository.existsById(id)) {
+            throw new UserApiException(UserErrorCode.ID_ALREADY_EXISTS); // 예외 발생
+        }
+    }
+
     private String generateEmployeeNum(LocalDateTime joinedAt) {
         String datePart = joinedAt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 

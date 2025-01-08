@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User u WHERE SUBSTRING(CAST(u.employeeNum AS string), 1, 8) = :joinedDate")
     Integer findMaxSuffixByJoinedDate(@Param("joinedDate") String joinedDate);
 
+    boolean existsById(String id);
+
 }

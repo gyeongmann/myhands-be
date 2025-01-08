@@ -4,4 +4,5 @@ import tabom.myhands.domain.user.dto.UserRequest;
 
 public interface UserService {
     void join(UserRequest.Join request);
+    void isDuplicate(String id);
 }
