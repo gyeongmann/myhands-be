@@ -7,7 +7,6 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 
 @Entity
-@DiscriminatorColumn(name = "quest_type")
 @Getter
 @Builder
 @NoArgsConstructor
@@ -17,6 +16,8 @@ public class Quest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questId;
+
+    private String questType;
 
     private String name;
 
@@ -29,12 +30,13 @@ public class Quest {
 
     private LocalDateTime completedAt;
 
-    private Quest(String name) {
+    private Quest(String questType, String name) {
+        this.questType = questType;
         this.name = name;
     }
 
-    public static Quest build(String name) {
-        return new Quest(name);
+    public static Quest build(String questType, String name) {
+        return new Quest(questType, name);
     }
 
     public void update(QuestGrade grade, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
