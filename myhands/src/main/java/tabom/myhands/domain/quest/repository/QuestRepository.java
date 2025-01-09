@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface QuestRepository extends JpaRepository<Quest, Long> {
 
     Optional<Quest> findByQuestId(Long questId);
-
 }

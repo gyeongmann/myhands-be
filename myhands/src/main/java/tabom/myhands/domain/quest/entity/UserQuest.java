@@ -23,5 +23,4 @@ public class UserQuest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quest_id")
     private Quest quest;
-
 }
