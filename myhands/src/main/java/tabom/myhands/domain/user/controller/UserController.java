@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tabom.myhands.common.response.DtoResponse;
 import tabom.myhands.common.response.MessageResponse;
 import tabom.myhands.domain.user.dto.UserRequest;
+import tabom.myhands.domain.user.dto.UserResponse;
 import tabom.myhands.domain.user.service.UserService;
 import tabom.myhands.common.properties.ResponseProperties;
 
@@ -27,5 +29,11 @@ public class UserController {
     public ResponseEntity<MessageResponse> checkDuplicate(@RequestParam String id) {
         userService.isDuplicate(id);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<DtoResponse<UserResponse.Login>> loginUser(@RequestBody UserRequest.Login request) {
+        UserResponse.Login response = userService.login(request);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 }
