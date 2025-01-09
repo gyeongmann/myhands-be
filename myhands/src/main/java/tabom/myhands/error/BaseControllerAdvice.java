@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tabom.myhands.common.response.ErrorResponse;
 import tabom.myhands.common.response.MessageResponse;
+import tabom.myhands.error.exception.AuthApiException;
 import tabom.myhands.error.exception.UserApiException;
 
 @RestControllerAdvice
@@ -63,6 +64,17 @@ public class BaseControllerAdvice {
     @ExceptionHandler(UserApiException.class)
     public ResponseEntity<ErrorResponse> handleUserApiException(UserApiException e, HttpServletRequest req) {
         log.debug("UserApiException");
+        log.error(req.getRequestURI());
+        log.error(e.getClass().getCanonicalName());
+        log.error(e.getErrorCode().getMessage());
+
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+                .body(ErrorResponse.of(e.getErrorCode()));
+    }
+
+    @ExceptionHandler(AuthApiException.class)
+    public ResponseEntity<ErrorResponse> handleAuthApiException(AuthApiException e, HttpServletRequest req) {
+        log.debug("AuthApiException");
         log.error(req.getRequestURI());
         log.error(e.getClass().getCanonicalName());
         log.error(e.getErrorCode().getMessage());

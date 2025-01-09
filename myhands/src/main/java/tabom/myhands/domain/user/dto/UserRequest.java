@@ -22,4 +22,12 @@ public class UserRequest {
         private Integer jobGroup; // 직무 그룹
         private String group; // 직군 (F,B,G,T)
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Login{
+        private String id;
+        private String password;
+    }
 }
