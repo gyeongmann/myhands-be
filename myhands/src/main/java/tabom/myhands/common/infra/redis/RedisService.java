@@ -26,4 +26,21 @@ public class RedisService {
         return operations.get(key);
     }
 
+    public void deleteRefreshToken(Long userId, boolean isAdmin) {
+        String redisKey = isAdmin ? "admin:" + userId : "user:" + userId;
+        redisTemplate.delete(redisKey);
+    }
+
+    public boolean isBlacklisted(String accessToken) {
+        return redisTemplate.hasKey(getBlacklistKey(accessToken));
+    }
+
+    private String getKey(Long userId) {
+        return "refreshToken:" + userId;
+    }
+
+    private String getBlacklistKey(String token) {
+        return "blacklist:" + token;
+    }
+
 }
