@@ -2,8 +2,6 @@ package tabom.myhands.domain.quest.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @AllArgsConstructor
@@ -18,7 +16,8 @@ public enum QuestGrade {
     JOB_FAILED("FAILED"),
     LEADER_MAX("MAX"),
     LEADER_MED("MED"),
-    LEADER_FAILED("FAILED");
+    LEADER_FAILED("FAILED"),
+    COMPANY("COMPANY");
 
     private final String name;
 }
