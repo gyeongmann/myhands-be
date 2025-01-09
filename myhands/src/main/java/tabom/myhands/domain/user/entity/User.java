@@ -54,6 +54,8 @@ public class User {
     @Column(nullable = false)
     private String level;
 
+    @Column(name = "device_token")
+    private String deviceToken;
 
     public static User build(UserRequest.Join request, Department department, String employeeNum, String level) {
 
