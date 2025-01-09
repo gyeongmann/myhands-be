@@ -11,8 +11,16 @@ public class QuestRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CompleteQuest {
-        private Long QuestId;
+    public static class Create{
+        private String questType;
+        private String name;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Complete {
+        private Long questId;
         private String grade;
         private Integer expAmount;
         private Boolean isCompleted;

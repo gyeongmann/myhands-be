@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface QuestService {
     
-    Quest createQuest(Quest quest);
+    Quest createQuest(QuestRequest.Create request);
 
-    Quest updateQuest(QuestRequest.CompleteQuest request);
+    Quest updateQuest(QuestRequest.Complete request);
 
     List<Quest> getUserQuestList(User user);
 }
