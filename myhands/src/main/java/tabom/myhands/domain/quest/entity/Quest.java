@@ -21,7 +21,7 @@ public class Quest {
 
     private String name;
 
-    private QuestGrade grade;
+    private String grade;
 
     private Integer expAmount;
 
@@ -39,7 +39,7 @@ public class Quest {
         return new Quest(questType, name);
     }
 
-    public void update(QuestGrade grade, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
+    public void update(String grade, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
         this.grade = grade;
         this.expAmount = expAmount;
         this.isCompleted = isCompleted;
