@@ -11,4 +11,6 @@ public interface BoardService {
     void delete(boolean isAdmin, Long boardId);
     BoardResponse.Detail detail(Long boardId);
     List<BoardResponse.BoardList> overview(int size);
+    List<BoardResponse.BoardList> list(int size, Long lastId);
+    List<BoardResponse.BoardList> search(String word, int size, Long lastId);
 }

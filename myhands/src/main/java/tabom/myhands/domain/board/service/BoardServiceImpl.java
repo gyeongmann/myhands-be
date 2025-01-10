@@ -77,4 +77,39 @@ public class BoardServiceImpl implements BoardService{
                 .map(BoardResponse.BoardList::build)
                 .toList();
     }
+
+    @Override
+    public List<BoardResponse.BoardList> list(int size, Long lastId) {
+        if(size <= 0){
+            throw new BoardApiException(BoardErrorCode.INVALID_SIZE_PARAMETER);
+        }
+        if(lastId != null) {
+            boardRepository.findByBoardId(lastId).orElseThrow(() -> new BoardApiException(BoardErrorCode.BOARD_ID_NOT_FOUND));
+        }
+
+        List<Board> boards = (lastId == null)
+                ? boardRepository.findAllFirstPage(size)
+                : boardRepository.findAllLastId(lastId, size);
+
+        return boards.stream()
+                .map(BoardResponse.BoardList::build)
+                .toList();
+    }
+
+    @Override
+    public List<BoardResponse.BoardList> search(String word, int size, Long lastId) {
+        if(size <= 0){
+            throw new BoardApiException(BoardErrorCode.INVALID_SIZE_PARAMETER);
+        }
+        if(lastId != null) {
+            boardRepository.findByBoardId(lastId).orElseThrow(() -> new BoardApiException(BoardErrorCode.BOARD_ID_NOT_FOUND));
+        }
+        List<Board> boards = (lastId == null)
+                ? boardRepository.findWordFirstPage(word, size)
+                : boardRepository.findWordLastId(word, lastId, size);
+
+        return boards.stream()
+                .map(BoardResponse.BoardList::build)
+                .toList();
+    }
 }

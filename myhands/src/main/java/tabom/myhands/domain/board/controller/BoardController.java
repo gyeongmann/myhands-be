@@ -56,4 +56,23 @@ public class BoardController {
         List<BoardResponse.BoardList> response = boardService.overview(size);
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<DtoResponse<List<BoardResponse.BoardList>>> list(
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long lastId
+    ){
+        List<BoardResponse.BoardList> response = boardService.list(size, lastId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<DtoResponse<List<BoardResponse.BoardList>>> search(
+            @RequestParam String word,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long lastId
+    ){
+        List<BoardResponse.BoardList> response = boardService.search(word, size, lastId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
 }
