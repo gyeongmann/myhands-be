@@ -97,11 +97,18 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void editPassword(Long userId, boolean isAdmin, UserRequest.Password requestDto) {
+    public void editPassword(Long userId, UserRequest.Password requestDto) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
-        System.out.println(requestDto.getPassword());
         user.changePassword(requestDto.getPassword());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void editImage(Long userId, Integer avartaId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        user.changeImage(avartaId);
         userRepository.save(user);
     }
 

@@ -51,8 +51,14 @@ public class UserController {
     @PatchMapping("/password")
     public ResponseEntity<MessageResponse> editPassword(HttpServletRequest request, @RequestBody UserRequest.Password requestDto){
         Long userId = (Long) request.getAttribute("userId");
-        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
-        userService.editPassword(userId, isAdmin, requestDto);
+        userService.editPassword(userId, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
+
+    @PatchMapping("/image")
+    public ResponseEntity<MessageResponse> editImage(HttpServletRequest request, @RequestParam Integer avartaId){
+        Long userId = (Long) request.getAttribute("userId");
+        userService.editImage(userId, avartaId);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
 }

@@ -81,4 +81,11 @@ public class User {
         }
         this.password = newPassword;
     }
+
+    public void changeImage(Integer avatarId) {
+        if (avatarId == null) {
+            throw new UserApiException(UserErrorCode.AVARTAID_CANNOT_BE_EMPTY);
+        }
+        this.avatarId = avatarId;
+    }
 }
