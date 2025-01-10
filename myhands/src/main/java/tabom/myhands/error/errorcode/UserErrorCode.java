@@ -13,7 +13,8 @@ public enum UserErrorCode implements ErrorCode{
     EMPLOYEE_NUM_ALREADY_EXISTS(1002, HttpStatus.BAD_REQUEST, "Employee number is already in use"),
     USER_ID_NOT_FOUND(1003, HttpStatus.NOT_FOUND, "User not found with the given ID"),
     LOGIN_FAILED(1004, HttpStatus.UNAUTHORIZED, "Invalid email or password."),
-    INVALID_LEVEL_VALUE(1005, HttpStatus.BAD_REQUEST, "Invalid Level value");
+    INVALID_LEVEL_VALUE(1005, HttpStatus.BAD_REQUEST, "Invalid Level value"),
+    PASSWORD_CANNOT_BE_EMPTY(1006, HttpStatus.BAD_REQUEST, "Password cannot be empty");
 
     private final int code;
     private final HttpStatus httpStatus;

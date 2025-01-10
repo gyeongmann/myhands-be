@@ -47,4 +47,12 @@ public class UserController {
         userService.logout(userId, isAdmin, accessToken);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
+
+    @PatchMapping("/password")
+    public ResponseEntity<MessageResponse> editPassword(HttpServletRequest request, @RequestBody UserRequest.Password requestDto){
+        Long userId = (Long) request.getAttribute("userId");
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.editPassword(userId, isAdmin, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
 }
