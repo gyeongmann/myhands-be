@@ -23,4 +23,13 @@ public class UserQuest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quest_id")
     private Quest quest;
+
+    private UserQuest(User user, Quest quest) {
+        this.user = user;
+        this.quest = quest;
+    }
+
+    public static UserQuest build(User user, Quest quest) {
+        return new UserQuest(user, quest);
+    }
 }
