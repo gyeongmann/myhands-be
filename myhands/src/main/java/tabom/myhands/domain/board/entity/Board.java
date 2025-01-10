@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import tabom.myhands.domain.board.dto.BoardRequest;
 
 import java.time.LocalDateTime;
 
@@ -35,4 +36,12 @@ public class Board {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    public static Board build(BoardRequest.Create request, Long userId) {
+        return Board.builder()
+                .userId(userId)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }
