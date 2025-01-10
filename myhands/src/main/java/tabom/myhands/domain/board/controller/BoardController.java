@@ -12,6 +12,8 @@ import tabom.myhands.domain.board.dto.BoardRequest;
 import tabom.myhands.domain.board.dto.BoardResponse;
 import tabom.myhands.domain.board.service.BoardService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/board")
@@ -47,5 +49,11 @@ public class BoardController {
     public ResponseEntity<DtoResponse<BoardResponse.Detail>> detail(@RequestParam Long boardId){
         BoardResponse.Detail response = boardService.detail(boardId);
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(),response));
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<DtoResponse<List<BoardResponse.BoardList>>> overview(@RequestParam(defaultValue = "6") int size){
+        List<BoardResponse.BoardList> response = boardService.overview(size);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 }

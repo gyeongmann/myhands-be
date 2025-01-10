@@ -9,6 +9,8 @@ import tabom.myhands.domain.board.repository.BoardRepository;
 import tabom.myhands.error.errorcode.BoardErrorCode;
 import tabom.myhands.error.exception.BoardApiException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService{
@@ -61,5 +63,18 @@ public class BoardServiceImpl implements BoardService{
         Board board = boardRepository.findByBoardId(boardId)
                 .orElseThrow(() -> new BoardApiException(BoardErrorCode.BOARD_ID_NOT_FOUND));
         return BoardResponse.Detail.build(board);
+    }
+
+    @Override
+    public List<BoardResponse.BoardList> overview(int size) {
+        if(size <= 0){
+            throw new BoardApiException(BoardErrorCode.INVALID_SIZE_PARAMETER);
+        }
+
+        List<Board> boards = boardRepository.findFirstPage(size);
+
+        return boards.stream()
+                .map(BoardResponse.BoardList::build)
+                .toList();
     }
 }
