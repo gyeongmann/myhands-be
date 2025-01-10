@@ -32,4 +32,13 @@ public class UserQuest {
     public static UserQuest build(User user, Quest quest) {
         return new UserQuest(user, quest);
     }
+
+    @Override
+    public String toString() {
+        return "UserQuest{" +
+                "userQuestId=" + userQuestId +
+                ", user=" + user +
+                ", quest=" + quest +
+                '}';
+    }
 }

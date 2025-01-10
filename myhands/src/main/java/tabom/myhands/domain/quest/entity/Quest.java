@@ -1,8 +1,13 @@
 package tabom.myhands.domain.quest.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +30,6 @@ public class Quest {
 
     private Integer expAmount;
 
-    @ColumnDefault("false")
     private Boolean isCompleted;
 
     private LocalDateTime completedAt;
@@ -33,6 +37,7 @@ public class Quest {
     private Quest(String questType, String name) {
         this.questType = questType;
         this.name = name;
+        this.isCompleted = false;
     }
 
     public static Quest build(String questType, String name) {
@@ -44,5 +49,18 @@ public class Quest {
         this.expAmount = expAmount;
         this.isCompleted = isCompleted;
         this.completedAt = completedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Quest{" +
+                "questId=" + questId +
+                ", questType='" + questType + '\'' +
+                ", name='" + name + '\'' +
+                ", grade='" + grade + '\'' +
+                ", expAmount=" + expAmount +
+                ", isCompleted=" + isCompleted +
+                ", completedAt=" + completedAt +
+                '}';
     }
 }
