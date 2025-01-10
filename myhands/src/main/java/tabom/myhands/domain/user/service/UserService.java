@@ -10,4 +10,5 @@ public interface UserService {
     void logout(Long userId, boolean isAdmin, String accessToken);
     void editPassword(Long userId, UserRequest.Password requestDto);
     void editImage(Long userId, Integer avartaId);
+    UserResponse.Info getInfo(Long userId);
 }

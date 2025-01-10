@@ -61,4 +61,12 @@ public class UserController {
         userService.editImage(userId, avartaId);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
+
+    @GetMapping("/info")
+    public ResponseEntity<DtoResponse<UserResponse.Info>> getInfo(HttpServletRequest request){
+        Long userId = (Long) request.getAttribute("userId");
+        UserResponse.Info response = userService.getInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
 }
