@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import tabom.myhands.domain.user.entity.User;
 
-import java.util.List;
 import java.util.Optional;
 
 
