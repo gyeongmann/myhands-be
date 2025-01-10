@@ -17,7 +17,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse retoken(Long userId, boolean isAdmin, String refreshToken) {
-        String storedToken = redisService.getStringValue(String.valueOf(userId));
+        String redisKey = isAdmin ? "admin:" + userId : "user:" + userId;
+        String storedToken = redisService.getStringValue(redisKey);
 
         if (storedToken == null) {
             throw new AuthApiException(AuthErrorCode.INVALID_TOKEN);

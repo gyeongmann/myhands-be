@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tabom.myhands.common.infra.redis.RedisService;
 import tabom.myhands.common.jwt.JwtTokenProvider;
 import tabom.myhands.domain.user.dto.UserRequest;
 import tabom.myhands.domain.user.dto.UserResponse;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService{
     private final DepartmentRepository departmentRepository;
     private final LevelService levelService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Transactional
     @Override
@@ -85,6 +87,37 @@ public class UserServiceImpl implements UserService{
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId, isAdmin);
 
         return UserResponse.Login.build(accessToken, refreshToken, isAdmin);
+    }
+
+    @Override
+    public void logout(Long userId, boolean isAdmin, String accessToken) {
+        redisService.deleteRefreshToken(userId, isAdmin);
+        long expirationTime = jwtTokenProvider.getExpirationTime(accessToken);
+        redisService.addToBlacklist(accessToken, expirationTime);
+    }
+
+    @Override
+    public void editPassword(Long userId, UserRequest.Password requestDto) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        user.changePassword(requestDto.getPassword());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void editImage(Long userId, Integer avartaId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        user.changeImage(avartaId);
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserResponse.Info getInfo(Long userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+
+        return UserResponse.Info.build(user);
     }
 
     private String generateEmployeeNum(LocalDateTime joinedAt) {

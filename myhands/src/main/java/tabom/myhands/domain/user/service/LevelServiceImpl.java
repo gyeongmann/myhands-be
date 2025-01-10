@@ -17,18 +17,22 @@ public class LevelServiceImpl implements LevelService {
 
     private final LevelProperties levelProperties;
 
-    public String calculateLevel(int currentExp) {
+    public String calculateLevel(String group, int currentExp) {
+        Map<String, Integer> groupLevels = levelProperties.getLevels().get(group);
+        if (groupLevels == null) {
+            throw new UserApiException(UserErrorCode.INVALID_LEVEL_VALUE); // 잘못된 그룹 입력 예외 처리
+        }
+
         String currentLevel = "Unknown";
 
-        for (Map<String, Integer> groupLevels : levelProperties.getLevels().values()) {
-            for (Map.Entry<String, Integer> entry : groupLevels.entrySet()) {
-                if (currentExp >= entry.getValue()) {
-                    currentLevel = entry.getKey(); // 경험치가 해당 레벨 이상이면 갱신
-                } else {
-                    break; // 현재 경험치보다 높은 레벨이 나오면 종료
-                }
+        for (Map.Entry<String, Integer> entry : groupLevels.entrySet()) {
+            if (currentExp >= entry.getValue()) {
+                currentLevel = entry.getKey(); // 경험치가 해당 레벨 이상이면 갱신
+            } else {
+                break; // 현재 경험치보다 높은 레벨이 나오면 종료
             }
         }
+
         return currentLevel;
     }
 

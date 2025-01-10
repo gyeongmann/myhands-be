@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tabom.myhands.common.response.ErrorResponse;
 import tabom.myhands.common.response.MessageResponse;
 import tabom.myhands.error.exception.AuthApiException;
+import tabom.myhands.error.exception.BoardApiException;
 import tabom.myhands.error.exception.UserApiException;
 
 @RestControllerAdvice
@@ -83,4 +84,14 @@ public class BaseControllerAdvice {
                 .body(ErrorResponse.of(e.getErrorCode()));
     }
 
+    @ExceptionHandler(BoardApiException.class)
+    public ResponseEntity<ErrorResponse> handleBoardApiException(BoardApiException e, HttpServletRequest req) {
+        log.debug("BoardApiException");
+        log.error(req.getRequestURI());
+        log.error(e.getClass().getCanonicalName());
+        log.error(e.getErrorCode().getMessage());
+
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+                .body(ErrorResponse.of(e.getErrorCode()));
+    }
 }

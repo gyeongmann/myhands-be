@@ -1,9 +1,13 @@
 package tabom.myhands.domain.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import tabom.myhands.domain.user.entity.User;
+
+import java.time.LocalDateTime;
 
 public class UserResponse {
 
@@ -21,6 +25,37 @@ public class UserResponse {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .admin(admin)
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Info{
+        private Long userId;
+        private String name;
+        private String id;
+        private String password;
+        private Integer employeeNum;
+        @JsonFormat(pattern = "yyyy-MM-dd" ,timezone = "Asia/Seoul")
+        private LocalDateTime joinedAt;
+        private String department;
+        private Integer avartaId;
+        private String level;
+
+        public static UserResponse.Info build(User user) {
+            return Info.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .id(user.getId())
+                    .password(user.getPassword())
+                    .employeeNum(user.getEmployeeNum())
+                    .joinedAt(user.getJoinedAt())
+                    .department(user.getDepartment().getName())
+                    .avartaId(user.getAvatarId())
+                    .level(user.getLevel())
                     .build();
         }
     }
