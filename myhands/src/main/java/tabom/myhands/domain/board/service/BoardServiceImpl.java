@@ -19,12 +19,28 @@ public class BoardServiceImpl implements BoardService{
         if(!isAdmin){
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
-
         if (requestDto.getTitle() == null || requestDto.getTitle().isEmpty() ||
                 requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
             throw new BoardApiException(BoardErrorCode.TITLE_OR_CONTENT_MISSING);
         }
 
         boardRepository.save(Board.build(requestDto, userId));
+    }
+
+    @Override
+    public void edit(Long userId, boolean isAdmin, BoardRequest.Edit requestDto) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+        if (requestDto.getTitle() == null || requestDto.getTitle().isEmpty() ||
+                requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
+            throw new BoardApiException(BoardErrorCode.TITLE_OR_CONTENT_MISSING);
+        }
+
+        Board board = boardRepository.findByBoardId(requestDto.getBoardId())
+                .orElseThrow(() -> new BoardApiException(BoardErrorCode.BOARD_ID_NOT_FOUND));
+
+        board.edit(requestDto);
+        boardRepository.save(board);
     }
 }

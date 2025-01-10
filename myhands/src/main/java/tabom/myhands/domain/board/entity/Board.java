@@ -44,4 +44,9 @@ public class Board {
                 .createdAt(LocalDateTime.now())
                 .build();
     }
+
+    public void edit(BoardRequest.Edit request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+    }
 }
