@@ -2,6 +2,7 @@ package tabom.myhands.domain.alarm.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +21,14 @@ public class AlarmController {
     private final AlarmService alarmService;
 
     @DeleteMapping("")
-    public ResponseEntity<MessageResponse> delete(ServletRequest servletRequest) {
-        alarmService.deleteAlarm((Long) servletRequest.getAttribute("userId"));
+    public ResponseEntity<MessageResponse> delete(HttpServletRequest request) {
+        alarmService.deleteAlarm((Long) request.getAttribute("userId"));
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
 
     @GetMapping("")
-    public ResponseEntity<DtoResponse<AlarmResponse.AlarmList>> list(ServletRequest servletRequest) {
-        AlarmResponse.AlarmList response = alarmService.getAlarmList((Long) servletRequest.getAttribute("userId"));
+    public ResponseEntity<DtoResponse<AlarmResponse.AlarmList>> list(HttpServletRequest request) {
+        AlarmResponse.AlarmList response = alarmService.getAlarmList((Long) request.getAttribute("userId"));
 
         if(response == null) {
             ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getFail(),null));

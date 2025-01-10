@@ -38,12 +38,12 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void deleteAlarm(Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findByUserId(userId).get();
         alarmRepository.deleteAllByUser(user);
     }
 
     public AlarmResponse.AlarmList getAlarmList(Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findByUserId(userId).get();
         List<AlarmResponse.CreateAlarm> recentList = new ArrayList<>();
         List<AlarmResponse.CreateAlarm> oldList = new ArrayList<>();
 
