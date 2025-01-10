@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tabom.myhands.common.infra.redis.RedisService;
 import tabom.myhands.common.jwt.JwtTokenProvider;
 import tabom.myhands.domain.user.dto.UserRequest;
 import tabom.myhands.domain.user.dto.UserResponse;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService{
     private final DepartmentRepository departmentRepository;
     private final LevelService levelService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Transactional
     @Override
@@ -85,6 +87,13 @@ public class UserServiceImpl implements UserService{
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId, isAdmin);
 
         return UserResponse.Login.build(accessToken, refreshToken, isAdmin);
+    }
+
+    @Override
+    public void logout(Long userId, boolean isAdmin, String accessToken) {
+        redisService.deleteRefreshToken(userId, isAdmin);
+        long expirationTime = jwtTokenProvider.getExpirationTime(accessToken);
+        redisService.addToBlacklist(accessToken, expirationTime);
     }
 
     private String generateEmployeeNum(LocalDateTime joinedAt) {
