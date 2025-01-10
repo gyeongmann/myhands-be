@@ -72,10 +72,10 @@ public class JwtTokenProvider {
                 throw new AuthApiException(AuthErrorCode.EXPIRED_TOKEN);
             }
 
-            String redisKey = isAdmin ? "admin:" + userId : "user:" + userId;
-            String storedToken = redisService.getStringValue(redisKey);
+            Long tokenUserId = Long.valueOf(claims.get("userId", String.class));
+            boolean tokenIsAdmin = claims.get("isAdmin", Boolean.class);
 
-            if (storedToken == null || !storedToken.equals(token)) {
+            if (!userId.equals(tokenUserId) || isAdmin != tokenIsAdmin) {
                 throw new AuthApiException(AuthErrorCode.INVALID_TOKEN);
             }
 
@@ -107,7 +107,6 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
             return claims.get("isAdmin", Boolean.class);
         } catch (Exception e) {
             throw new AuthApiException(AuthErrorCode.INVALID_TOKEN);
