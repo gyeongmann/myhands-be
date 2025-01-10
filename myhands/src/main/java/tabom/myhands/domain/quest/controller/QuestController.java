@@ -1,5 +1,6 @@
 package tabom.myhands.domain.quest.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,13 +48,15 @@ public class QuestController {
     }
 
     @GetMapping
-    public ResponseEntity<DtoResponse<List<QuestResponse>>> getQuests(@RequestParam Long userId) {
+    public ResponseEntity<DtoResponse<List<QuestResponse>>> getQuests(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
         List<QuestResponse> quests = userQuestService.getQuests(userId);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), quests));
     }
 
     @GetMapping("/completelist")
-    public ResponseEntity<DtoResponse<List<QuestResponse>>> getCompletedQuests(@RequestParam Long userId) {
+    public ResponseEntity<DtoResponse<List<QuestResponse>>> getCompletedQuests(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
         List<QuestResponse> completedQuest = userQuestService.getCompletedQuest(userId);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), completedQuest));
     }
