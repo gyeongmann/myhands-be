@@ -35,8 +35,8 @@ public class RedisService {
         return redisTemplate.hasKey(getBlacklistKey(accessToken));
     }
 
-    private String getKey(Long userId) {
-        return "refreshToken:" + userId;
+    public void addToBlacklist(String accessToken, long expirationTime) {
+        redisTemplate.opsForValue().set(getBlacklistKey(accessToken), "true", expirationTime, TimeUnit.MILLISECONDS);
     }
 
     private String getBlacklistKey(String token) {
