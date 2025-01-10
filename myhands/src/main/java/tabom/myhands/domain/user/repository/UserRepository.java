@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import tabom.myhands.domain.user.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -17,5 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Integer findMaxSuffixByJoinedDate(@Param("joinedDate") String joinedDate);
 
     boolean existsById(String id);
+
+    Optional<User> findByUserId(Long userId);
 
 }
