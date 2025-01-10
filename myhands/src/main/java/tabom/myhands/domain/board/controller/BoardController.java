@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tabom.myhands.common.properties.ResponseProperties;
+import tabom.myhands.common.response.DtoResponse;
 import tabom.myhands.common.response.MessageResponse;
 import tabom.myhands.domain.board.dto.BoardRequest;
+import tabom.myhands.domain.board.dto.BoardResponse;
 import tabom.myhands.domain.board.service.BoardService;
 
 @RestController
@@ -39,5 +41,11 @@ public class BoardController {
         boolean isAdmin = (boolean) request.getAttribute("isAdmin");
         boardService.delete(isAdmin, boardId);
         return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.of(HttpStatus.CREATED, responseProperties.getSuccess()));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<DtoResponse<BoardResponse.Detail>> detail(@RequestParam Long boardId){
+        BoardResponse.Detail response = boardService.detail(boardId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(),response));
     }
 }
