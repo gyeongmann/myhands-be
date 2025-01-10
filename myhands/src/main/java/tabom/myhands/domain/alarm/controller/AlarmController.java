@@ -36,10 +36,4 @@ public class AlarmController {
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(),response));
     }
 
-//    @GetMapping("")
-//    public ResponseEntity<MessageResponse> testAlarm() throws FirebaseMessagingException {
-//        alarmService.sendMessage("f_9TvC02n0dFlU6d1viTFs:APA91bFcEfGNSJ84vkLSNQ3eecjD0owD49uRagkFzWh0V413_eQVeceJmY-tbz-zS8Sovrd0dR0zoLWxw9-BWQCDRUf1ap_UxR_EFXu0pFpybDPgSGQmcTQ",
-//                "푸쉬푸쉬 테스트", "푸쉬푸쉬 베이베 내 푸쉬 받아줘");
-//        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
-//    }
 }

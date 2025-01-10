@@ -16,17 +16,12 @@ import tabom.myhands.domain.alarm.entity.Alarm;
 import tabom.myhands.domain.alarm.repository.AlarmRepository;
 import tabom.myhands.domain.user.entity.User;
 import tabom.myhands.domain.user.repository.UserRepository;
-import tabom.myhands.error.errorcode.UserErrorCode;
-import tabom.myhands.error.exception.UserApiException;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +42,8 @@ public class AlarmServiceImpl implements AlarmService {
         List<AlarmResponse.CreateAlarm> recentList = new ArrayList<>();
         List<AlarmResponse.CreateAlarm> oldList = new ArrayList<>();
 
-        List<Alarm> alarmList = alarmRepository.findAllByUserOrderByCreateAtDesc(user);
+        List<Alarm> alarmList = alarmRepository.findAllByUser(user);
+        Collections.sort(alarmList, (o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
 
         for(Alarm a : alarmList) {
             boolean lastDay = a.getCreatedAt().isBefore(LocalDate.now().atStartOfDay());
@@ -83,20 +79,18 @@ public class AlarmServiceImpl implements AlarmService {
         return diffMin + "분 전";
     }
 
-    /*
 
-    public void sendMessage(String token, String title, String body) throws FirebaseMessagingException {
-//         String message = FirebaseMessaging.getInstance().send(Message.builder()
-//                .setNotification(Notification.builder()
-//                        .setTitle(title)
-//                        .setBody(body)
-//                        .build())
-//                .setToken(token)  // 대상 디바이스의 등록 토큰
-//                .build());
+    public void sendMessage(User user, Alarm alarm) throws FirebaseMessagingException {
+        String title = "공지사항";
+        String body = alarm.getTitle();
 
+        if(!alarm.isCategory()) {
+            title = "경험치 획득";
+            body = body + "\n" + alarm.getExp() + " do를 획득하셨습니다.";
+        }
 
         Message message = Message.builder()
-                .setToken(token)
+                .setToken(user.getDeviceToken())
                 .setNotification(Notification.builder()
                         .setTitle(title)
                         .setBody(body)
@@ -104,20 +98,6 @@ public class AlarmServiceImpl implements AlarmService {
                 .build();
 
         String response = FirebaseMessaging.getInstance().send(message);
-        System.out.println("Successfully sent message: " + response);
     }
-
-    private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "myhandsFirebaseKey.json";
-
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
-
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
-    }
-
-     */
 
 }
