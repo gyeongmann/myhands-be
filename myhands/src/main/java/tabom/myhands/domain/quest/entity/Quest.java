@@ -50,17 +50,4 @@ public class Quest {
         this.isCompleted = isCompleted;
         this.completedAt = completedAt;
     }
-
-    @Override
-    public String toString() {
-        return "Quest{" +
-                "questId=" + questId +
-                ", questType='" + questType + '\'' +
-                ", name='" + name + '\'' +
-                ", grade='" + grade + '\'' +
-                ", expAmount=" + expAmount +
-                ", isCompleted=" + isCompleted +
-                ", completedAt=" + completedAt +
-                '}';
-    }
 }
