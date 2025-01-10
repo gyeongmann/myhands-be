@@ -33,4 +33,11 @@ public class BoardController {
         boardService.edit(userId, isAdmin, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.of(HttpStatus.CREATED, responseProperties.getSuccess()));
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<MessageResponse> delete(HttpServletRequest request, @RequestParam Long boardId){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        boardService.delete(isAdmin, boardId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.of(HttpStatus.CREATED, responseProperties.getSuccess()));
+    }
 }

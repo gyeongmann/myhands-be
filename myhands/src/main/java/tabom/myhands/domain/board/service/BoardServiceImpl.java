@@ -43,4 +43,15 @@ public class BoardServiceImpl implements BoardService{
         board.edit(requestDto);
         boardRepository.save(board);
     }
+
+    @Override
+    public void delete(boolean isAdmin, Long boardId) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+        Board board = boardRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new BoardApiException(BoardErrorCode.BOARD_ID_NOT_FOUND));
+
+        boardRepository.delete(board);
+    }
 }
