@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tabom.myhands.domain.user.dto.UserRequest;
+import tabom.myhands.error.errorcode.UserErrorCode;
+import tabom.myhands.error.exception.UserApiException;
 
 import java.time.LocalDateTime;
 
@@ -73,4 +75,17 @@ public class User {
                 .build();
     }
 
+    public void changePassword(String newPassword) {
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new UserApiException(UserErrorCode.PASSWORD_CANNOT_BE_EMPTY);
+        }
+        this.password = newPassword;
+    }
+
+    public void changeImage(Integer avatarId) {
+        if (avatarId == null) {
+            throw new UserApiException(UserErrorCode.AVARTAID_CANNOT_BE_EMPTY);
+        }
+        this.avatarId = avatarId;
+    }
 }

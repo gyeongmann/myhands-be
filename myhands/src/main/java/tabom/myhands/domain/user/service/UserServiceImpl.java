@@ -96,6 +96,30 @@ public class UserServiceImpl implements UserService{
         redisService.addToBlacklist(accessToken, expirationTime);
     }
 
+    @Override
+    public void editPassword(Long userId, UserRequest.Password requestDto) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        user.changePassword(requestDto.getPassword());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void editImage(Long userId, Integer avartaId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        user.changeImage(avartaId);
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserResponse.Info getInfo(Long userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+
+        return UserResponse.Info.build(user);
+    }
+
     private String generateEmployeeNum(LocalDateTime joinedAt) {
         String datePart = joinedAt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 

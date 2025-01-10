@@ -47,4 +47,26 @@ public class UserController {
         userService.logout(userId, isAdmin, accessToken);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
+
+    @PatchMapping("/password")
+    public ResponseEntity<MessageResponse> editPassword(HttpServletRequest request, @RequestBody UserRequest.Password requestDto){
+        Long userId = (Long) request.getAttribute("userId");
+        userService.editPassword(userId, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
+
+    @PatchMapping("/image")
+    public ResponseEntity<MessageResponse> editImage(HttpServletRequest request, @RequestParam Integer avartaId){
+        Long userId = (Long) request.getAttribute("userId");
+        userService.editImage(userId, avartaId);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<DtoResponse<UserResponse.Info>> getInfo(HttpServletRequest request){
+        Long userId = (Long) request.getAttribute("userId");
+        UserResponse.Info response = userService.getInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
 }
