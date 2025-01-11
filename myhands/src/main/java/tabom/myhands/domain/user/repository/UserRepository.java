@@ -30,4 +30,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmployeeNum(Integer num);
 
     List<User> findAll();
+
+    List<User> findUsersByDepartmentAndJobGroup(Department department, Integer jobGroup);
 }

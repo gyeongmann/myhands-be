@@ -13,12 +13,4 @@ public class UserQuestRequest {
         private Long userId;
         private Long questId;
     }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateJobQuest {
-        private Integer departmentId;
-        private Integer weekCount;
-    }
 }

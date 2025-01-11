@@ -10,7 +10,6 @@ import tabom.myhands.common.properties.ResponseProperties;
 import tabom.myhands.common.response.DtoResponse;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
-import tabom.myhands.domain.quest.dto.UserQuestRequest;
 import tabom.myhands.domain.quest.dto.UserQuestResponse;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.quest.service.QuestService;
@@ -41,10 +40,25 @@ public class QuestController {
     }
 
     @PostMapping("/job")
-    public ResponseEntity<DtoResponse<List<UserQuestResponse>>> createWeekCountJobQuest(@RequestBody UserQuestRequest.CreateJobQuest request) {
-        Quest weekCountJobQuest = questService.createWeekCountJobQuest(request.getWeekCount());
-        List<UserQuestResponse> jobQuest = userQuestService.createJobQuest(request.getDepartmentId(), weekCountJobQuest);
+    public ResponseEntity<DtoResponse<List<UserQuestResponse>>> createWeekCountJobQuest(@RequestBody QuestRequest.JobQuest request) {
+        Quest weekCountJobQuest = questService.createWeekCountJobQuest(request);
+        List<UserQuestResponse> jobQuest = userQuestService.createJobUserQuest(request.getDepartmentName(), request.getJobGroup(), weekCountJobQuest);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.CREATED, responseProperties.getSuccess(), jobQuest));
+    }
+
+    @PatchMapping("/job")
+    public ResponseEntity<DtoResponse<QuestResponse>> updateWeekCountJobQuest(@RequestBody QuestRequest.UpdateJobQuest request) {
+        QuestResponse response = questService.updateWeekCountJobQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @GetMapping("/job")
+    public ResponseEntity<DtoResponse<QuestResponse>> getWeekCountJobQuest(@RequestParam String departmentName,
+                                                                           @RequestParam Integer jobGroup,
+                                                                           @RequestParam Integer weekCount) {
+        QuestRequest.JobQuest request = new QuestRequest.JobQuest(departmentName, jobGroup, weekCount);
+        QuestResponse response = questService.getWeekCountJobQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
     @GetMapping
