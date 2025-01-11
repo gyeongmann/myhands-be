@@ -34,14 +34,12 @@ public class Quest {
 
     private LocalDateTime completedAt;
 
-    private Quest(String questType, String name) {
-        this.questType = questType;
-        this.name = name;
-        this.isCompleted = false;
-    }
-
     public static Quest build(String questType, String name) {
-        return new Quest(questType, name);
+        return Quest.builder()
+                .questType(questType)
+                .name(name)
+                .isCompleted(false) // 기본값 설정
+                .build();
     }
 
     public void update(String grade, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
