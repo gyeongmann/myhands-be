@@ -14,4 +14,5 @@ public interface UserService {
     void editImage(Long userId, Integer avartaId);
     UserResponse.Info getInfo(Long userId);
     List<UserResponse.UserList> getList(boolean isAdmin);
+    UserResponse.Detail getDetail(boolean isAdmin, Long userId);
 }

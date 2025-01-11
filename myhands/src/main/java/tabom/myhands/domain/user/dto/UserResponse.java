@@ -83,4 +83,33 @@ public class UserResponse {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Detail{
+        private Long userId;
+        private String name;
+        private String id;
+        private String password;
+        private Integer employeeNum;
+        @JsonFormat(pattern = "yyyy.MM.dd" ,timezone = "Asia/Seoul")
+        private LocalDateTime joinedAt;
+        private String department;
+        private Integer jobGroup;
+
+        public static UserResponse.Detail build(User user) {
+            return Detail.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .id(user.getId())
+                    .password(user.getPassword())
+                    .employeeNum(user.getEmployeeNum())
+                    .joinedAt(user.getJoinedAt())
+                    .department(user.getDepartment().getName())
+                    .jobGroup(user.getJobGroup())
+                    .build();
+        }
+    }
 }

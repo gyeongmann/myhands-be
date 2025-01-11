@@ -139,6 +139,16 @@ public class UserServiceImpl implements UserService{
                 .toList();
     }
 
+    @Override
+    public UserResponse.Detail getDetail(boolean isAdmin, Long userId) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        return UserResponse.Detail.build(user);
+    }
+
     private String generateEmployeeNum(LocalDateTime joinedAt) {
         String datePart = joinedAt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 

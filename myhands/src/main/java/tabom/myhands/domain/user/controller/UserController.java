@@ -80,4 +80,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
+    @GetMapping("/detail")
+    public ResponseEntity<DtoResponse<UserResponse.Detail>> getDetail(HttpServletRequest request, @RequestParam Long userId){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        UserResponse.Detail response = userService.getDetail(isAdmin, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
 }
