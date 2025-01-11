@@ -1,9 +1,6 @@
 package tabom.myhands.domain.quest.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +21,7 @@ public class Quest {
 
     private String questType;
 
+    @Column(unique = true)
     private String name;
 
     private String grade;
