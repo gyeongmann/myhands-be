@@ -16,4 +16,5 @@ public interface UserService {
     List<UserResponse.UserList> getList(boolean isAdmin);
     UserResponse.Detail getDetail(boolean isAdmin, Long userId);
     void update(boolean isAdmin, UserRequest.Update requestDto);
+    void isDuplicateNum(boolean isAdmin, Integer num);
 }

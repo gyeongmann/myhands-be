@@ -165,6 +165,17 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
     }
 
+    @Override
+    public void isDuplicateNum(boolean isAdmin, Integer num) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+
+        if (userRepository.existsByEmployeeNum(num)) {
+            throw new UserApiException(UserErrorCode.EMPLOYEE_NUM_ALREADY_EXISTS);
+        }
+    }
+
     private String generateEmployeeNum(LocalDateTime joinedAt) {
         String datePart = joinedAt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 

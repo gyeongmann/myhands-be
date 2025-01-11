@@ -93,4 +93,11 @@ public class UserController {
         userService.update(isAdmin, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
+
+    @GetMapping("/employeenum")
+    public  ResponseEntity<MessageResponse> checkDuplicateNum(HttpServletRequest request, @RequestParam Integer num){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.isDuplicateNum(isAdmin, num);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
 }
