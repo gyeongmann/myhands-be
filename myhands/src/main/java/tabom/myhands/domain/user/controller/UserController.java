@@ -24,14 +24,16 @@ public class UserController {
     private final ResponseProperties responseProperties;
 
     @PostMapping(value ="/join")
-    public ResponseEntity<MessageResponse> createUser(@RequestBody UserRequest.Join requestDto) {
-        userService.join(requestDto);
+    public ResponseEntity<MessageResponse> createUser(HttpServletRequest request, @RequestBody UserRequest.Join requestDto) {
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.join(isAdmin, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.of(HttpStatus.CREATED, responseProperties.getSuccess()));
     }
 
     @GetMapping("/duplicate")
-    public ResponseEntity<MessageResponse> checkDuplicate(@RequestParam String id) {
-        userService.isDuplicate(id);
+    public ResponseEntity<MessageResponse> checkDuplicate(HttpServletRequest request, @RequestParam String id) {
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.isDuplicate(isAdmin, id);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
 

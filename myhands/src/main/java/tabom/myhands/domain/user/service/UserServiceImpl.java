@@ -38,8 +38,10 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void join(UserRequest.Join request) {
-
+    public void join(boolean isAdmin, UserRequest.Join request) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
         if(userRepository.findById(request.getId()).isPresent()){
             throw new UserApiException(UserErrorCode.ID_ALREADY_EXISTS);
         }
@@ -56,7 +58,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void isDuplicate(String id) {
+    public void isDuplicate(boolean isAdmin, String id) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
         if (userRepository.existsById(id)) {
             throw new UserApiException(UserErrorCode.ID_ALREADY_EXISTS);
         }
