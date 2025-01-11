@@ -13,6 +13,8 @@ import tabom.myhands.domain.user.dto.UserResponse;
 import tabom.myhands.domain.user.service.UserService;
 import tabom.myhands.common.properties.ResponseProperties;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -22,14 +24,16 @@ public class UserController {
     private final ResponseProperties responseProperties;
 
     @PostMapping(value ="/join")
-    public ResponseEntity<MessageResponse> createUser(@RequestBody UserRequest.Join requestDto) {
-        userService.join(requestDto);
+    public ResponseEntity<MessageResponse> createUser(HttpServletRequest request, @RequestBody UserRequest.Join requestDto) {
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.join(isAdmin, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.of(HttpStatus.CREATED, responseProperties.getSuccess()));
     }
 
     @GetMapping("/duplicate")
-    public ResponseEntity<MessageResponse> checkDuplicate(@RequestParam String id) {
-        userService.isDuplicate(id);
+    public ResponseEntity<MessageResponse> checkDuplicate(HttpServletRequest request, @RequestParam String id) {
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.isDuplicate(isAdmin, id);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
 
@@ -69,4 +73,31 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<DtoResponse<List<UserResponse.UserList>>> getList(HttpServletRequest request){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        List<UserResponse.UserList> response = userService.getList(isAdmin);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<DtoResponse<UserResponse.Detail>> getDetail(HttpServletRequest request, @RequestParam Long userId){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        UserResponse.Detail response = userService.getDetail(isAdmin, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @PatchMapping("/update")
+    public  ResponseEntity<MessageResponse> update(HttpServletRequest request, @RequestBody UserRequest.Update requestDto){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.update(isAdmin, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
+
+    @GetMapping("/employeenum")
+    public  ResponseEntity<MessageResponse> checkDuplicateNum(HttpServletRequest request, @RequestParam Integer num){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.isDuplicateNum(isAdmin, num);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
 }

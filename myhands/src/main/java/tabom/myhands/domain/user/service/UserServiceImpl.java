@@ -14,11 +14,14 @@ import tabom.myhands.domain.user.entity.User;
 import tabom.myhands.domain.user.repository.AdminRepository;
 import tabom.myhands.domain.user.repository.DepartmentRepository;
 import tabom.myhands.domain.user.repository.UserRepository;
+import tabom.myhands.error.errorcode.BoardErrorCode;
 import tabom.myhands.error.errorcode.UserErrorCode;
+import tabom.myhands.error.exception.BoardApiException;
 import tabom.myhands.error.exception.UserApiException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,8 +38,10 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void join(UserRequest.Join request) {
-
+    public void join(boolean isAdmin, UserRequest.Join request) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
         if(userRepository.findById(request.getId()).isPresent()){
             throw new UserApiException(UserErrorCode.ID_ALREADY_EXISTS);
         }
@@ -44,7 +49,7 @@ public class UserServiceImpl implements UserService{
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_DEPARTMENT_VALUE));
 
-        String employeeNum = generateEmployeeNum(request.getJoinedAt());
+        String employeeNum = generateEmployeeNum(request.getJoinedAt().atStartOfDay());
 
         String level = levelService.getLowestLevel(request.getGroup());
 
@@ -53,7 +58,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void isDuplicate(String id) {
+    public void isDuplicate(boolean isAdmin, String id) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
         if (userRepository.existsById(id)) {
             throw new UserApiException(UserErrorCode.ID_ALREADY_EXISTS);
         }
@@ -118,6 +126,54 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
 
         return UserResponse.Info.build(user);
+    }
+
+    @Override
+    public List<UserResponse.UserList> getList(boolean isAdmin) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+        List<User> users = userRepository.findAllUser();
+        return users.stream()
+                .map(UserResponse.UserList::build)
+                .toList();
+    }
+
+    @Override
+    public UserResponse.Detail getDetail(boolean isAdmin, Long userId) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        return UserResponse.Detail.build(user);
+    }
+
+    @Override
+    public void update(boolean isAdmin, UserRequest.Update requestDto) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+
+        User user = userRepository.findByUserId(requestDto.getUserId())
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+
+        Department department = departmentRepository.findById(requestDto.getDepartmentId())
+                .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_DEPARTMENT_VALUE));
+
+        user.changeDetail(requestDto, department);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void isDuplicateNum(boolean isAdmin, Integer num) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+
+        if (userRepository.existsByEmployeeNum(num)) {
+            throw new UserApiException(UserErrorCode.EMPLOYEE_NUM_ALREADY_EXISTS);
+        }
     }
 
     private String generateEmployeeNum(LocalDateTime joinedAt) {

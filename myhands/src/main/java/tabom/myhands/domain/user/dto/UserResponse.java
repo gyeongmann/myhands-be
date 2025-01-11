@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tabom.myhands.domain.user.entity.User;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class UserResponse {
 
@@ -40,7 +40,7 @@ public class UserResponse {
         private String password;
         private Integer employeeNum;
         @JsonFormat(pattern = "yyyy-MM-dd" ,timezone = "Asia/Seoul")
-        private LocalDateTime joinedAt;
+        private LocalDate joinedAt;
         private String department;
         private Integer avartaId;
         private String level;
@@ -56,6 +56,59 @@ public class UserResponse {
                     .department(user.getDepartment().getName())
                     .avartaId(user.getAvatarId())
                     .level(user.getLevel())
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserList{
+        private Long userId;
+        private String name;
+        private Integer employeeNum;
+        private String department;
+        private Integer avartaId;
+        private String level;
+
+        public static UserResponse.UserList build(User user) {
+            return UserList.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .employeeNum(user.getEmployeeNum())
+                    .department(user.getDepartment().getName())
+                    .avartaId(user.getAvatarId())
+                    .level(user.getLevel())
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Detail{
+        private Long userId;
+        private String name;
+        private String id;
+        private String password;
+        private Integer employeeNum;
+        @JsonFormat(pattern = "yyyy.MM.dd" ,timezone = "Asia/Seoul")
+        private LocalDate joinedAt;
+        private String department;
+        private Integer jobGroup;
+
+        public static UserResponse.Detail build(User user) {
+            return Detail.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .id(user.getId())
+                    .password(user.getPassword())
+                    .employeeNum(user.getEmployeeNum())
+                    .joinedAt(user.getJoinedAt())
+                    .department(user.getDepartment().getName())
+                    .jobGroup(user.getJobGroup())
                     .build();
         }
     }
