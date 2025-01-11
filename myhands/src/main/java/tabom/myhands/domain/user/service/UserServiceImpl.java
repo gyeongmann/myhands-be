@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService{
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_DEPARTMENT_VALUE));
 
-        String employeeNum = generateEmployeeNum(request.getJoinedAt());
+        String employeeNum = generateEmployeeNum(request.getJoinedAt().atStartOfDay());
 
         String level = levelService.getLowestLevel(request.getGroup());
 
@@ -147,6 +147,22 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
         return UserResponse.Detail.build(user);
+    }
+
+    @Override
+    public void update(boolean isAdmin, UserRequest.Update requestDto) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+
+        User user = userRepository.findByUserId(requestDto.getUserId())
+                .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+
+        Department department = departmentRepository.findById(requestDto.getDepartmentId())
+                .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_DEPARTMENT_VALUE));
+
+        user.changeDetail(requestDto, department);
+        userRepository.save(user);
     }
 
     private String generateEmployeeNum(LocalDateTime joinedAt) {

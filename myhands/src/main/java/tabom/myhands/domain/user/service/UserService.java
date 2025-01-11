@@ -15,4 +15,5 @@ public interface UserService {
     UserResponse.Info getInfo(Long userId);
     List<UserResponse.UserList> getList(boolean isAdmin);
     UserResponse.Detail getDetail(boolean isAdmin, Long userId);
+    void update(boolean isAdmin, UserRequest.Update requestDto);
 }

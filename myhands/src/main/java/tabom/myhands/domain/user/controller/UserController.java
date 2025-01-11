@@ -86,4 +86,11 @@ public class UserController {
         UserResponse.Detail response = userService.getDetail(isAdmin, userId);
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
+
+    @PatchMapping("/update")
+    public  ResponseEntity<MessageResponse> update(HttpServletRequest request, @RequestBody UserRequest.Update requestDto){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        userService.update(isAdmin, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
 }

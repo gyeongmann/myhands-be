@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tabom.myhands.domain.user.entity.User;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class UserResponse {
 
@@ -40,7 +40,7 @@ public class UserResponse {
         private String password;
         private Integer employeeNum;
         @JsonFormat(pattern = "yyyy-MM-dd" ,timezone = "Asia/Seoul")
-        private LocalDateTime joinedAt;
+        private LocalDate joinedAt;
         private String department;
         private Integer avartaId;
         private String level;
@@ -95,7 +95,7 @@ public class UserResponse {
         private String password;
         private Integer employeeNum;
         @JsonFormat(pattern = "yyyy.MM.dd" ,timezone = "Asia/Seoul")
-        private LocalDateTime joinedAt;
+        private LocalDate joinedAt;
         private String department;
         private Integer jobGroup;
 
