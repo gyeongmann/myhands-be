@@ -41,7 +41,6 @@ public class UserQuestServiceImpl implements UserQuestService {
     @Override
     @Transactional
     public UserQuest createUserQuest(UserQuestRequest.Create request) {
-        System.out.println(request.getQuestId() + " " + request.getQuestId());
         Optional<User> optionalUser = userRepository.findByUserId(request.getUserId());
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
 
