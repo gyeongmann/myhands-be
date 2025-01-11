@@ -10,7 +10,6 @@ import tabom.myhands.common.properties.ResponseProperties;
 import tabom.myhands.common.response.DtoResponse;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
-import tabom.myhands.domain.quest.dto.UserQuestResponse;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.quest.service.QuestService;
 import tabom.myhands.domain.quest.service.UserQuestService;
@@ -40,10 +39,10 @@ public class QuestController {
     }
 
     @PostMapping("/job")
-    public ResponseEntity<DtoResponse<List<UserQuestResponse>>> createWeekCountJobQuest(@RequestBody QuestRequest.JobQuest request) {
+    public ResponseEntity<DtoResponse<QuestResponse>> createWeekCountJobQuest(@RequestBody QuestRequest.JobQuest request) {
         Quest weekCountJobQuest = questService.createWeekCountJobQuest(request);
-        List<UserQuestResponse> jobQuest = userQuestService.createJobUserQuest(request.getDepartmentName(), request.getJobGroup(), weekCountJobQuest);
-        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.CREATED, responseProperties.getSuccess(), jobQuest));
+        QuestResponse response = QuestResponse.from(weekCountJobQuest);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.CREATED, responseProperties.getSuccess(), response));
     }
 
     @PatchMapping("/job")
