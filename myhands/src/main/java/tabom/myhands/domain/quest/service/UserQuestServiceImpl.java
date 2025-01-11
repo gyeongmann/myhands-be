@@ -103,7 +103,7 @@ public class UserQuestServiceImpl implements UserQuestService {
 
         User user = optionalUser.get();
         List<QuestResponse> completedQuests = new ArrayList<>();
-        List<UserQuest> userQuests = userQuestRepository.findByUser(user);
+        List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         for (UserQuest userQuest : userQuests) {
             Quest quest = userQuest.getQuest();
             if (quest.getIsCompleted()) {
