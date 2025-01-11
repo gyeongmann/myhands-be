@@ -40,6 +40,15 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional
     public Quest createWeekCountJobQuest(QuestRequest.JobQuest request) {
+        Optional<Quest> existingQuest = questRepository.findByFormattedName(
+                request.getDepartmentName(),
+                request.getJobGroup(),
+                request.getWeekCount()
+        );
+        if (existingQuest.isPresent()) {
+            return existingQuest.get(); // 이미 존재하면 새로 생성하지 않고 반환
+        }
+
         Optional<Department> optionalDepartment = departmentRepository.findDepartmentByName(request.getDepartmentName());
         if (optionalDepartment.isEmpty()) {
             throw new IllegalArgumentException("Department not found");
