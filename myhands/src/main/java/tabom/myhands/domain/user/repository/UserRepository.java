@@ -24,4 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findUsersByDepartment(Department department);
 
+    @Query(value = "SELECT * FROM user ORDER BY name, department_id, employee_num", nativeQuery = true)
+    List<User> findAllUser();
+
+    boolean existsByEmployeeNum(Integer num);
 }
