@@ -59,4 +59,28 @@ public class UserResponse {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserList{
+        private Long userId;
+        private String name;
+        private Integer employeeNum;
+        private String department;
+        private Integer avartaId;
+        private String level;
+
+        public static UserResponse.UserList build(User user) {
+            return UserList.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .employeeNum(user.getEmployeeNum())
+                    .department(user.getDepartment().getName())
+                    .avartaId(user.getAvatarId())
+                    .level(user.getLevel())
+                    .build();
+        }
+    }
 }

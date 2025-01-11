@@ -14,11 +14,14 @@ import tabom.myhands.domain.user.entity.User;
 import tabom.myhands.domain.user.repository.AdminRepository;
 import tabom.myhands.domain.user.repository.DepartmentRepository;
 import tabom.myhands.domain.user.repository.UserRepository;
+import tabom.myhands.error.errorcode.BoardErrorCode;
 import tabom.myhands.error.errorcode.UserErrorCode;
+import tabom.myhands.error.exception.BoardApiException;
 import tabom.myhands.error.exception.UserApiException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -118,6 +121,17 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
 
         return UserResponse.Info.build(user);
+    }
+
+    @Override
+    public List<UserResponse.UserList> getList(boolean isAdmin) {
+        if(!isAdmin){
+            throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
+        }
+        List<User> users = userRepository.findAllUser();
+        return users.stream()
+                .map(UserResponse.UserList::build)
+                .toList();
     }
 
     private String generateEmployeeNum(LocalDateTime joinedAt) {

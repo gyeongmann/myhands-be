@@ -13,6 +13,8 @@ import tabom.myhands.domain.user.dto.UserResponse;
 import tabom.myhands.domain.user.service.UserService;
 import tabom.myhands.common.properties.ResponseProperties;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -66,6 +68,13 @@ public class UserController {
     public ResponseEntity<DtoResponse<UserResponse.Info>> getInfo(HttpServletRequest request){
         Long userId = (Long) request.getAttribute("userId");
         UserResponse.Info response = userService.getInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<DtoResponse<List<UserResponse.UserList>>> getList(HttpServletRequest request){
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        List<UserResponse.UserList> response = userService.getList(isAdmin);
         return ResponseEntity.status(HttpStatus.OK).body(DtoResponse.of(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
