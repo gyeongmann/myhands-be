@@ -10,6 +10,8 @@ public interface QuestService {
     
     Quest createQuest(QuestRequest.Create request);
 
+    Quest createWeekCountJobQuest(Integer weekCount);
+
     Quest updateQuest(QuestRequest.Complete request);
 
     List<Quest> getUserQuestList(User user);
