@@ -1,7 +1,5 @@
 package tabom.myhands.domain.alarm.controller;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +13,7 @@ import tabom.myhands.domain.alarm.service.AlarmService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("alarm")
+@RequestMapping("/alarm")
 public class AlarmController {
     private final ResponseProperties responseProperties;
     private final AlarmService alarmService;

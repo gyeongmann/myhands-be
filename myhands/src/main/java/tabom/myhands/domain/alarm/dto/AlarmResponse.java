@@ -2,7 +2,6 @@ package tabom.myhands.domain.alarm.dto;
 
 import lombok.*;
 import tabom.myhands.domain.alarm.entity.Alarm;
-import tabom.myhands.domain.user.dto.UserResponse;
 
 import java.util.List;
 

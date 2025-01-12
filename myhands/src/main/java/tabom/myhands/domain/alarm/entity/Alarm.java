@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import tabom.myhands.domain.board.entity.Board;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.user.entity.User;
 
@@ -41,28 +42,19 @@ public class Alarm {
     @CreatedDate
     private LocalDateTime createdAt;
 
-        public static Alarm BoardAlarmCreate(String title, Long boardId, User user){
+    public static Alarm BoardAlarmCreate(Board board, User user){
         return Alarm.builder()
                 .user(user)
-                .title(title)
+                .title(board.getTitle())
                 .category(true)
-                .boardId(boardId)
+                .boardId(board.getBoardId())
                 .build();
     }
 
-//    public static Alarm BoardAlarmCreate(Board board, User user){
-//        return Alarm.builder()
-//                .user(user)
-//                .title(board.getTitle())
-//                .category(true)
-//                .boardId(board.getBoardId())
-//                .build();
-//    }
+    public static Alarm ExpAlarmCreate(Quest quest, User user) {
+        String title = quest.getName() + "!";
 
-        public static Alarm ExpAlarmCreate(Quest quest, User user) {
-            String title = quest.getName() + "!";
-
-            return Alarm.builder()
+        return Alarm.builder()
                 .user(user)
                 .title(title)
                 .category(false)

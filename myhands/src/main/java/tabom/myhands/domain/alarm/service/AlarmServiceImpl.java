@@ -1,6 +1,5 @@
 package tabom.myhands.domain.alarm.service;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -9,13 +8,14 @@ import com.google.firebase.messaging.Notification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import tabom.myhands.domain.alarm.dto.AlarmResponse;
 import tabom.myhands.domain.alarm.entity.Alarm;
 import tabom.myhands.domain.alarm.repository.AlarmRepository;
 import tabom.myhands.domain.user.entity.User;
 import tabom.myhands.domain.user.repository.UserRepository;
+import tabom.myhands.error.errorcode.UserErrorCode;
+import tabom.myhands.error.exception.UserApiException;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -33,17 +33,17 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void deleteAlarm(Long userId) {
-        User user = userRepository.findByUserId(userId).get();
+        User user = userRepository.findByUserId(userId).orElseThrow(()-> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
         alarmRepository.deleteAllByUser(user);
     }
 
+    @Override
     public AlarmResponse.AlarmList getAlarmList(Long userId) {
-        User user = userRepository.findByUserId(userId).get();
+        User user = userRepository.findByUserId(userId).orElseThrow(()-> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
         List<AlarmResponse.CreateAlarm> recentList = new ArrayList<>();
         List<AlarmResponse.CreateAlarm> oldList = new ArrayList<>();
 
-        List<Alarm> alarmList = alarmRepository.findAllByUser(user);
-        Collections.sort(alarmList, (o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
+        List<Alarm> alarmList = alarmRepository.findAllByUserOrderByCreatedAtDesc(user);
 
         for(Alarm a : alarmList) {
             boolean lastDay = a.getCreatedAt().isBefore(LocalDate.now().atStartOfDay());
@@ -79,7 +79,7 @@ public class AlarmServiceImpl implements AlarmService {
         return diffMin + "분 전";
     }
 
-
+    @Override
     public void sendMessage(User user, Alarm alarm) throws FirebaseMessagingException {
         String title = "공지사항";
         String body = alarm.getTitle();
