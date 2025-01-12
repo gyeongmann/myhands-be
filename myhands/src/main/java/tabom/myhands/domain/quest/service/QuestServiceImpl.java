@@ -89,7 +89,7 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = optionalQuest.get();
         LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount()-1);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedDateTime);
-        // TODO: 경험치 생성
+        // TODO: 직무별 퀘스트 경험치 생성
         return QuestResponse.from(quest);
     }
 
@@ -128,7 +128,7 @@ public class QuestServiceImpl implements QuestService {
                 .withDayOfMonth(LocalDate.of(2025, request.getMonth(), 1).lengthOfMonth());
         LocalDateTime completedAt = LocalDateTime.of(lastDayOfMonth.getYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDayOfMonth(), 23, 59);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
-        // TODO: 경험치 생성
+        // TODO: 리더부여 퀘스트 경험치 생성
         return QuestResponse.from(quest);
     }
 
@@ -230,7 +230,7 @@ public class QuestServiceImpl implements QuestService {
         Integer month = request.getIsFirstHalf() ? 1 : 6;
         LocalDateTime completedAt = LocalDateTime.of(2025, month, 30, 0, 0);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
-        // TODO: 전사 프로젝트 경험치 생성
+        // TODO: 인사평가 경험치 생성
         return QuestResponse.from(quest);
     }
 }
