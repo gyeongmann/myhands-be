@@ -6,13 +6,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
+import tabom.myhands.domain.quest.dto.UserQuestRequest;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.quest.entity.UserQuest;
 import tabom.myhands.domain.quest.repository.QuestRepository;
+import tabom.myhands.domain.quest.repository.UserQuestRepository;
 import tabom.myhands.domain.user.entity.Department;
 import tabom.myhands.domain.user.entity.User;
 import tabom.myhands.domain.user.repository.DepartmentRepository;
+import tabom.myhands.domain.user.repository.UserRepository;
+import tabom.myhands.error.errorcode.UserErrorCode;
+import tabom.myhands.error.exception.UserApiException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +35,8 @@ public class QuestServiceImpl implements QuestService {
     private final QuestRepository questRepository;
     private final UserQuestService userQuestService;
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
+    private final UserQuestRepository userQuestRepository;
 
     @Override
     @Transactional
@@ -85,6 +93,48 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = optionalQuest.get();
         LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount()-1);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedDateTime);
+        // TODO: 경험치 생성
+        return QuestResponse.from(quest);
+    }
+
+    @Override
+    @Transactional
+    public QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request) {
+        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
+        if (optionalUser.isEmpty()) {
+            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
+        }
+
+        User user = optionalUser.get();
+        List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
+        String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
+        for (UserQuest userQuest : userQuests) {
+            Quest quest = userQuest.getQuest();
+            String questName = quest.getName();
+            if (questName.equals(formattedQuestName)) {
+                return QuestResponse.from(quest);
+            }
+        }
+
+        Quest quest = createQuest(new QuestRequest.Create("leader", formattedQuestName));
+        userQuestService.createUserQuest(new UserQuestRequest.Create(user.getUserId(), quest.getQuestId()));
+        return QuestResponse.from(quest);
+    }
+
+    @Override
+    @Transactional
+    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) {
+        String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
+        Optional<Quest> optionalQuest = questRepository.findQuestByName(formattedQuestName);
+        if (optionalQuest.isEmpty()) {
+            throw new IllegalArgumentException("Quest not found");
+        }
+        Quest quest = optionalQuest.get();
+        LocalDate lastDayOfMonth = LocalDate.of(2025, request.getMonth(), 1)
+                .withDayOfMonth(LocalDate.of(2025, request.getMonth(), 1).lengthOfMonth());
+        LocalDateTime completedAt = LocalDateTime.of(lastDayOfMonth.getYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDayOfMonth(), 23, 59);
+        quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
+        // TODO: 경험치 생성
         return QuestResponse.from(quest);
     }
 
@@ -99,6 +149,7 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = optionalQuest.get();
 
         quest.update(request.getGrade(), request.getExpAmount(), request.getIsCompleted(), request.getCompletedAt());
+        // TODO: 경험치 생성
         return quest;
     }
 

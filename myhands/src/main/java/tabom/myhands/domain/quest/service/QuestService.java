@@ -17,7 +17,11 @@ public interface QuestService {
 
     Quest createWeekCountJobQuest(QuestRequest.JobQuest request);
 
+    QuestResponse getWeekCountJobQuest(QuestRequest.JobQuest request);
+
     QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request);
 
-    QuestResponse getWeekCountJobQuest(QuestRequest.JobQuest request);
+    QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request);
+
+    QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request);
 }
