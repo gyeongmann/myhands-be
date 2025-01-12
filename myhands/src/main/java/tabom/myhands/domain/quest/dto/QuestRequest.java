@@ -104,4 +104,25 @@ public class QuestRequest {
         private String projectName;
         private Integer expAmount;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HRQuest {
+        private Boolean isFirstHalf;
+        private Integer employeeNum;
+        private String name;
+        private String grade;
+        private Integer expAmount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateHRQuest {
+        private Long questId;
+        private Boolean isFirstHalf;
+        private String grade;
+        private Integer expAmount;
+    }
 }

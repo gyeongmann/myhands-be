@@ -28,4 +28,8 @@ public interface QuestService {
     QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request);
 
     QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request);
+
+    QuestResponse getHRQuest(QuestRequest.HRQuest request);
+
+    QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request);
 }
