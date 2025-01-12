@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class UserRequest {
 
@@ -16,8 +16,8 @@ public class UserRequest {
         private String name;
         private String id;
         private String password;
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Seoul" )
-        private LocalDateTime joinedAt;
+        @JsonFormat(pattern = "yyyy-MM-dd" , timezone = "Asia/Seoul" )
+        private LocalDate joinedAt;
         private Integer departmentId;
         private Integer jobGroup; // 직무 그룹
         private String group; // 직군 (F,B,G,T)
@@ -29,5 +29,25 @@ public class UserRequest {
     public static class Login{
         private String id;
         private String password;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Password{
+        private String password;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Update {
+        private Long userId;
+        private String name;
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        private LocalDate joinedAt;
+        private Integer departmentId;
+        private Integer jobGroup;
+        private Integer employeeNum;
     }
 }

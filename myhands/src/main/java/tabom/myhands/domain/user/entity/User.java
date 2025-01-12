@@ -7,8 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tabom.myhands.domain.user.dto.UserRequest;
+import tabom.myhands.error.errorcode.UserErrorCode;
+import tabom.myhands.error.exception.UserApiException;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -39,9 +41,9 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "joined_at", nullable = false, updatable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Seoul" )
-    private LocalDateTime joinedAt;
+    @Column(name = "joined_at", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd" , timezone = "Asia/Seoul" )
+    private LocalDate joinedAt;
 
     @Column(name = "avatar_id")
     private Integer avatarId;
@@ -71,6 +73,44 @@ public class User {
                 .jobGroup(request.getJobGroup())
                 .level(level)
                 .build();
+    }
+
+    public void changePassword(String newPassword) {
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new UserApiException(UserErrorCode.PASSWORD_CANNOT_BE_EMPTY);
+        }
+        this.password = newPassword;
+    }
+
+    public void changeImage(Integer avatarId) {
+        if (avatarId == null) {
+            throw new UserApiException(UserErrorCode.AVARTAID_CANNOT_BE_EMPTY);
+        }
+        this.avatarId = avatarId;
+    }
+
+    public void changeDetail(UserRequest.Update request, Department department) {
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new UserApiException(UserErrorCode.NAME_CANNOT_BE_EMPTY);
+        }
+        if (request.getEmployeeNum() == null) {
+            throw new UserApiException(UserErrorCode.EMPLOYEE_NUM_CANNOT_BE_EMPTY);
+        }
+        if (department == null) {
+            throw new UserApiException(UserErrorCode.DEPARTMENT_CANNOT_BE_EMPTY);
+        }
+        if (request.getJobGroup() == null) {
+            throw new UserApiException(UserErrorCode.JOB_GROUP_CANNOT_BE_EMPTY);
+        }
+        if (request.getJoinedAt() == null) {
+            throw new UserApiException(UserErrorCode.JOINED_AT_CANNOT_BE_EMPTY);
+        }
+
+        this.name = request.getName();
+        this.employeeNum = request.getEmployeeNum();
+        this.department = department;
+        this.jobGroup = request.getJobGroup();
+        this.joinedAt = request.getJoinedAt();
     }
 
 }

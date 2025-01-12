@@ -2,11 +2,13 @@ package tabom.myhands.domain.quest.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tabom.myhands.domain.user.entity.User;
 
 @Entity
+@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,4 +25,11 @@ public class UserQuest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quest_id")
     private Quest quest;
+
+    public static UserQuest build(User user, Quest quest) {
+        return UserQuest.builder()
+                .user(user)
+                .quest(quest)
+                .build();
+    }
 }
