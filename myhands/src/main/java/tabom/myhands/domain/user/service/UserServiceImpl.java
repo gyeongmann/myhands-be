@@ -88,6 +88,8 @@ public class UserServiceImpl implements UserService{
             if (!user.getPassword().equals(request.getPassword())) {
                 throw new UserApiException(UserErrorCode.LOGIN_FAILED);
             }
+            user.changeDeviceToken(request.getDeviceToken());
+            userRepository.save(user);
         }
 
         Long userId = isAdmin ? adminOptional.get().getAdminId() : userOptional.get().getUserId();

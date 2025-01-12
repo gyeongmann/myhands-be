@@ -75,6 +75,10 @@ public class User {
                 .build();
     }
 
+    public void changeDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
     public void changePassword(String newPassword) {
         if (newPassword == null || newPassword.isEmpty()) {
             throw new UserApiException(UserErrorCode.PASSWORD_CANNOT_BE_EMPTY);

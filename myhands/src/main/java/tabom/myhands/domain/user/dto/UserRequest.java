@@ -29,6 +29,7 @@ public class UserRequest {
     public static class Login{
         private String id;
         private String password;
+        private String deviceToken;
     }
 
     @Getter

@@ -36,5 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 
+### properties ###
 application-db.properties
+application-jwt.properties
+
+### firebase ###
+myhandsFirebaseKey.json
 application-jwt.properties

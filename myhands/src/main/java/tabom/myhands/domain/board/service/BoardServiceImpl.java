@@ -1,7 +1,10 @@
 package tabom.myhands.domain.board.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tabom.myhands.domain.alarm.service.AlarmService;
 import tabom.myhands.domain.board.dto.BoardRequest;
 import tabom.myhands.domain.board.dto.BoardResponse;
 import tabom.myhands.domain.board.entity.Board;
@@ -16,9 +19,11 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService{
 
     private final BoardRepository boardRepository;
+    private final AlarmService alarmService;
 
     @Override
-    public void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto) {
+    @Transactional
+    public void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto) throws FirebaseMessagingException {
         if(!isAdmin){
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
@@ -27,7 +32,9 @@ public class BoardServiceImpl implements BoardService{
             throw new BoardApiException(BoardErrorCode.TITLE_OR_CONTENT_MISSING);
         }
 
-        boardRepository.save(Board.build(requestDto, userId));
+        Board board = Board.build(requestDto, userId);
+        boardRepository.save(board);
+        alarmService.createBoardAlarm(board);
     }
 
     @Override
