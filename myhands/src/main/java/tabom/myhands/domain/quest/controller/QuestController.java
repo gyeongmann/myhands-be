@@ -91,4 +91,22 @@ public class QuestController {
         List<QuestResponse> completedQuest = userQuestService.getCompletedQuest(userId);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), completedQuest));
     }
+
+    @GetMapping("/company")
+    public ResponseEntity<DtoResponse<QuestResponse>> getCompanyQuest(@RequestParam Integer month,
+                                                                      @RequestParam Integer day,
+                                                                     @RequestParam Integer employeeNum,
+                                                                     @RequestParam String name,
+                                                                     @RequestParam String projectName,
+                                                                     @RequestParam Integer expAmount) {
+        QuestRequest.CompanyQuest request = new QuestRequest.CompanyQuest(month, day, employeeNum, name, projectName, expAmount);
+        QuestResponse response = questService.getCompanyQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @PatchMapping("/company")
+    public ResponseEntity<DtoResponse<QuestResponse>> updateCompanyQuest(@RequestBody QuestRequest.UpdateCompanyQuest request) {
+        QuestResponse response = questService.updateCompanyQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
 }

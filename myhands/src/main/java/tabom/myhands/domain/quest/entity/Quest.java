@@ -46,4 +46,11 @@ public class Quest {
         this.isCompleted = isCompleted;
         this.completedAt = completedAt;
     }
+
+    public void updateCompanyProject(String name, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
+        this.name = name;
+        this.expAmount = expAmount;
+        this.isCompleted = isCompleted;
+        this.completedAt = completedAt;
+    }
 }

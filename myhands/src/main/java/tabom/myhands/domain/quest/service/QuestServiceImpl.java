@@ -163,4 +163,43 @@ public class QuestServiceImpl implements QuestService {
         return quests;
     }
 
+    @Override
+    @Transactional
+    public QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request) {
+        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
+        if (optionalUser.isEmpty()) {
+            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
+        }
+
+        User user = optionalUser.get();
+        List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
+        String format = String.format("%s | %s", request.getProjectName(), request.getName());
+        for (UserQuest userQuest : userQuests) {
+            Quest quest = userQuest.getQuest();
+            String questName = quest.getName();
+            if (questName.equals(format)) {
+                return QuestResponse.from(quest);
+            }
+        }
+
+        Quest quest = createQuest(new QuestRequest.Create("company", format));
+        userQuestService.createUserQuest(new UserQuestRequest.Create(user.getUserId(), quest.getQuestId()));
+        return QuestResponse.from(quest);
+    }
+
+    @Override
+    @Transactional
+    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) {
+        Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
+        if (optionalQuest.isEmpty()) {
+            throw new IllegalArgumentException("Quest not found");
+        }
+        
+        Quest quest = optionalQuest.get();
+        LocalDateTime completedAt = LocalDateTime.of(2025, request.getMonth(), request.getDay(), 0, 0);
+        String questName = String.format("%s | %s", request.getProjectName(), request.getName());
+        quest.updateCompanyProject(questName, request.getExpAmount(), true, completedAt);
+        // TODO: 전사 프로젝트 경험치 생성
+        return QuestResponse.from(quest);
+    }
 }

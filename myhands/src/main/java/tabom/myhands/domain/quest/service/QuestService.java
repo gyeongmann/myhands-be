@@ -24,4 +24,8 @@ public interface QuestService {
     QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request);
 
     QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request);
+
+    QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request);
+
+    QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request);
 }
