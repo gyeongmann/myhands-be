@@ -15,7 +15,7 @@ public interface UserQuestService {
 
     UserQuest createUserQuest(UserQuestRequest.Create request);
 
-    List<UserQuestResponse> createJobQuest(Integer departmentId, Quest weekCountJobQuest);
+    List<UserQuestResponse> createJobUserQuest(String departmentName, Integer jobGroup, Quest weekCountJobQuest);
 
     List<QuestResponse> getQuests(Long userId);
 

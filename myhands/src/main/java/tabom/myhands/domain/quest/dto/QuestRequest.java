@@ -27,6 +27,28 @@ public class QuestRequest {
         private LocalDateTime completedAt;
     }
 
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class JobQuest {
+        private String departmentName;
+        private Integer jobGroup;
+        private Integer weekCount;
+    }
+
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateJobQuest {
+        private String departmentName;
+        private Integer jobGroup;
+        private Integer weekCount;
+        private String grade;
+        private Integer expAmount;
+    }
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor

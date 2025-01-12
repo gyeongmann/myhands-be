@@ -61,14 +61,14 @@ public class UserQuestServiceImpl implements UserQuestService {
 
     @Override
     @Transactional
-    public List<UserQuestResponse> createJobQuest(Integer departmentId, Quest weekCountJobQuest) {
-        Optional<Department> optionalDepartment = departmentRepository.findDepartmentByDepartmentId(departmentId);
+    public List<UserQuestResponse> createJobUserQuest(String departmentName, Integer jobGroup, Quest weekCountJobQuest) {
+        Optional<Department> optionalDepartment = departmentRepository.findDepartmentByName(departmentName);
         if (optionalDepartment.isEmpty()) {
             throw new IllegalArgumentException("No department found");
         }
 
         List<UserQuestResponse> response = new ArrayList<>();
-        List<User> usersByDepartment = userRepository.findUsersByDepartment(optionalDepartment.get());
+        List<User> usersByDepartment = userRepository.findUsersByDepartmentAndJobGroup(optionalDepartment.get(), jobGroup);
         for (User user : usersByDepartment) {
             UserQuest userQuest = createUserQuest(new UserQuestRequest.Create(user.getUserId(), weekCountJobQuest.getQuestId()));
             response.add(UserQuestResponse.from(userQuest));
