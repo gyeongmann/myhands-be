@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllUser();
 
     boolean existsByEmployeeNum(Integer num);
+
+    List<User> findAll();
 }

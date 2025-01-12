@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import tabom.myhands.domain.alarm.dto.AlarmResponse;
 import tabom.myhands.domain.alarm.entity.Alarm;
 import tabom.myhands.domain.alarm.repository.AlarmRepository;
+import tabom.myhands.domain.board.entity.Board;
+import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.user.entity.User;
 import tabom.myhands.domain.user.repository.UserRepository;
 import tabom.myhands.error.errorcode.UserErrorCode;
@@ -60,6 +62,26 @@ public class AlarmServiceImpl implements AlarmService {
         return AlarmResponse.AlarmList.build(recentList, oldList);
     }
 
+    @Override
+    @Transactional
+    public void createBoardAlarm(Board board) throws FirebaseMessagingException {
+        List<User> users = userRepository.findAll();
+
+        for(User user : users) {
+            Alarm alarm = Alarm.BoardAlarmCreate(user, board);
+            alarmRepository.save(alarm);
+            sendMessage(user, alarm);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void createExpAlarm(User user, Quest quest) throws FirebaseMessagingException {
+        Alarm alarm = Alarm.ExpAlarmCreate(user, quest);
+        alarmRepository.save(alarm);
+        sendMessage(user, alarm);
+    }
+
     private String formatCreatedAt(LocalDateTime d, boolean lastDay) {
         if(lastDay) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy. M. d.");
@@ -79,7 +101,6 @@ public class AlarmServiceImpl implements AlarmService {
         return diffMin + "분 전";
     }
 
-    @Override
     public void sendMessage(User user, Alarm alarm) throws FirebaseMessagingException {
         String title = "공지사항";
         String body = alarm.getTitle();

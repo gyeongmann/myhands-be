@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import tabom.myhands.domain.board.entity.Board;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.user.entity.User;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "alarm")
 public class Alarm {
     @Id
@@ -42,7 +44,7 @@ public class Alarm {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public static Alarm BoardAlarmCreate(Board board, User user){
+    public static Alarm BoardAlarmCreate(User user, Board board){
         return Alarm.builder()
                 .user(user)
                 .title(board.getTitle())
@@ -51,7 +53,7 @@ public class Alarm {
                 .build();
     }
 
-    public static Alarm ExpAlarmCreate(Quest quest, User user) {
+    public static Alarm ExpAlarmCreate(User user, Quest quest) {
         String title = quest.getName() + "!";
 
         return Alarm.builder()
