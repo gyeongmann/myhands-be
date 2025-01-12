@@ -41,6 +41,8 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
+	implementation 'com.google.firebase:firebase-admin:9.4.2'
+
 }
 
 tasks.named('test') {

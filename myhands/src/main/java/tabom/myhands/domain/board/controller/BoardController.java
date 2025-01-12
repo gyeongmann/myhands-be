@@ -1,5 +1,6 @@
 package tabom.myhands.domain.board.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class BoardController {
     private final ResponseProperties responseProperties;
 
     @PostMapping("/create")
-    public ResponseEntity<MessageResponse> create(HttpServletRequest request, @RequestBody BoardRequest.Create requestDto) {
+    public ResponseEntity<MessageResponse> create(HttpServletRequest request, @RequestBody BoardRequest.Create requestDto) throws FirebaseMessagingException {
         Long userId = (Long) request.getAttribute("userId");
         boolean isAdmin = (boolean) request.getAttribute("isAdmin");
         boardService.create(userId, isAdmin, requestDto);

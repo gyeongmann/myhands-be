@@ -1,12 +1,13 @@
 package tabom.myhands.domain.board.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import tabom.myhands.domain.board.dto.BoardRequest;
 import tabom.myhands.domain.board.dto.BoardResponse;
 
 import java.util.List;
 
 public interface BoardService {
-    void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto);
+    void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto) throws FirebaseMessagingException;
     void edit(Long userId, boolean isAdmin, BoardRequest.Edit requestDto);
     void delete(boolean isAdmin, Long boardId);
     BoardResponse.Detail detail(Long boardId);
