@@ -1,11 +1,9 @@
 package tabom.myhands.common.infra.redis;
 
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -43,4 +41,24 @@ public class RedisService {
         return "blacklist:" + token;
     }
 
+    private void addDepartmentExp(int departmentId, int exp) {
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+        String key = "department:" + departmentId + ":exp";
+
+        String beforeExp = valueOps.get(key);
+        int newExp = (beforeExp != null ? Integer.parseInt(beforeExp) : 0) + exp;
+
+        valueOps.set(key, String.valueOf(newExp));
+    }
+
+    @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")
+    private void resetWeeklyDepartmentExp() {
+        Set<String> keys = redisTemplate.keys("department:*:exp");
+
+        if (keys != null) {
+            for (String key : keys) {
+                redisTemplate.opsForValue().set(key, "0");
+            }
+        }
+    }
 }
