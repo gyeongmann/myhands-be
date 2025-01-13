@@ -26,6 +26,7 @@ public class Quest {
 
     private String grade;
 
+    @Column(nullable = false)
     private Integer expAmount;
 
     private Boolean isCompleted;
@@ -36,6 +37,7 @@ public class Quest {
         return Quest.builder()
                 .questType(questType)
                 .name(name)
+                .expAmount(0)
                 .isCompleted(false) // 기본값 설정
                 .build();
     }

@@ -47,4 +47,24 @@ public class LevelServiceImpl implements LevelService {
                 .findFirst() // 최하위 레벨 선택
                 .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_LEVEL_VALUE));
     }
+
+    public Map.Entry<String, Integer> getNextLevel(String group, String currentLevel) {
+        // 그룹의 레벨 데이터 가져오기
+        Map<String, Integer> groupLevels = levelProperties.getLevels().get(group);
+        if (groupLevels == null) {
+            throw new UserApiException(UserErrorCode.INVALID_LEVEL_VALUE);
+        }
+
+        boolean foundCurrent = false;
+        for (Map.Entry<String, Integer> entry : groupLevels.entrySet()) {
+            if (foundCurrent) {
+                return entry; // 현재 레벨 이후의 첫 번째 레벨 반환
+            }
+            if (entry.getKey().equals(currentLevel)) {
+                foundCurrent = true; // 현재 레벨을 찾으면 플래그 설정
+            }
+        }
+
+        return null; // 다음 레벨이 없는 경우 null 반환
+    }
 }
