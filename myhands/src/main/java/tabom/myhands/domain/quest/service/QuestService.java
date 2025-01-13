@@ -1,5 +1,6 @@
 package tabom.myhands.domain.quest.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.quest.entity.Quest;
@@ -32,4 +33,6 @@ public interface QuestService {
     QuestResponse getHRQuest(QuestRequest.HRQuest request);
 
     QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request);
+
+    QuestResponse.QuestCalendar getQuestCalendar(HttpServletRequest servletRequest, QuestRequest.QuestCalendar request);
 }
