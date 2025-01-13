@@ -100,4 +100,14 @@ public class UserController {
         userService.isDuplicateNum(isAdmin, num);
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<DtoResponse<UserResponse.MyPageResponse>> getMyPageInfo(HttpServletRequest request) {
+        boolean isAdmin = (boolean) request.getAttribute("isAdmin");
+        if (isAdmin) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DtoResponse.of(HttpStatus.BAD_REQUEST, "BAD REQUEST", null));
+        }
+        UserResponse.MyPageResponse response = userService.getMyPageInfo(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
 }

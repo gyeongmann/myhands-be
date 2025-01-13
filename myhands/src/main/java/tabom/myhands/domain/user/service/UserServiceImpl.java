@@ -1,11 +1,20 @@
 package tabom.myhands.domain.user.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tabom.myhands.common.infra.redis.RedisService;
 import tabom.myhands.common.jwt.JwtTokenProvider;
+import tabom.myhands.domain.fortune.service.FortuneService;
+import tabom.myhands.domain.quest.entity.Quest;
+import tabom.myhands.domain.quest.entity.UserQuest;
+import tabom.myhands.domain.quest.repository.QuestRepository;
+import tabom.myhands.domain.quest.repository.UserQuestRepository;
+import tabom.myhands.domain.quest.service.ExpService;
+import tabom.myhands.domain.quest.service.QuestService;
 import tabom.myhands.domain.user.dto.UserRequest;
 import tabom.myhands.domain.user.dto.UserResponse;
 import tabom.myhands.domain.user.entity.Admin;
@@ -19,15 +28,17 @@ import tabom.myhands.error.errorcode.UserErrorCode;
 import tabom.myhands.error.exception.BoardApiException;
 import tabom.myhands.error.exception.UserApiException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
@@ -35,14 +46,19 @@ public class UserServiceImpl implements UserService{
     private final LevelService levelService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
+    private final FortuneService fortuneService;
+    private final QuestService questService;
+    private final QuestRepository questRepository;
+    private final UserQuestRepository userQuestRepository;
+    private final ExpService expService;
 
     @Transactional
     @Override
     public void join(boolean isAdmin, UserRequest.Join request) {
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
-        if(userRepository.findById(request.getId()).isPresent()){
+        if (userRepository.findById(request.getId()).isPresent()) {
             throw new UserApiException(UserErrorCode.ID_ALREADY_EXISTS);
         }
 
@@ -59,7 +75,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void isDuplicate(boolean isAdmin, String id) {
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
         if (userRepository.existsById(id)) {
@@ -132,7 +148,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<UserResponse.UserList> getList(boolean isAdmin) {
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
         List<User> users = userRepository.findAllUser();
@@ -143,7 +159,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponse.Detail getDetail(boolean isAdmin, Long userId) {
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
         User user = userRepository.findByUserId(userId)
@@ -153,7 +169,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void update(boolean isAdmin, UserRequest.Update requestDto) {
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
 
@@ -169,7 +185,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void isDuplicateNum(boolean isAdmin, Integer num) {
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }
 
@@ -187,5 +203,81 @@ public class UserServiceImpl implements UserService{
 
         // 사번 생성 (YYYYMMDD + 순번)
         return datePart + String.format("%02d", nextSuffix);
+    }
+
+    @Override
+    public User getUserByUserId(Long userId) {
+        Optional<User> optionalUser = userRepository.findByUserId(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
+        }
+        return optionalUser.get();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponse.MyPageResponse getMyPageInfo(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        User user = getUserByUserId(userId);
+        Integer currentExp = expService.getCurrentExp(user);
+        String group = user.getLevel().substring(0, 1);
+        String currentLevel = levelService.calculateLevel(group, currentExp);
+        Map.Entry<String, Integer> nextLevelMap = levelService.getNextLevel(group, currentLevel);
+
+        // fortune
+        UserResponse.MyPageResponse.Fortune fortune = getFortune(String.valueOf(userId));
+
+        // levelRate
+        UserResponse.MyPageResponse.LevelRate levelRate = getLevelRate(currentExp, currentLevel, nextLevelMap);
+
+        // recentExp
+        UserResponse.MyPageResponse.RecentExp recentExp = getRecentExp(user);
+
+        // thisYearExp
+        UserResponse.MyPageResponse.ThisYearExp thisYearExp = getThisYearExp(user);
+
+        // lastYearExp
+        UserResponse.MyPageResponse.LastYearExp lastYearExp = getLastYearExp(user);
+
+        return UserResponse.MyPageResponse.build(fortune, levelRate, recentExp, thisYearExp, lastYearExp);
+    }
+
+    private UserResponse.MyPageResponse.Fortune getFortune(String userId) {
+        String fortune = fortuneService.getFortune(Integer.parseInt(userId));
+        return UserResponse.MyPageResponse.Fortune.build(LocalDate.now(), fortune);
+    }
+
+    private UserResponse.MyPageResponse.LevelRate getLevelRate(Integer currentExp, String currentLevel, Map.Entry<String, Integer> nextLevelMap) {
+        String nextLevel = nextLevelMap.getKey();
+        Integer nextExp = nextLevelMap.getValue();
+        int leftExp = nextExp - currentExp;
+        int percent = Math.round((float) currentExp / nextExp * 100);
+
+        return UserResponse.MyPageResponse.LevelRate.build(currentLevel, currentExp, nextLevel, leftExp, percent);
+    }
+
+    private UserResponse.MyPageResponse.RecentExp getRecentExp(User user) {
+        List<UserQuest> recentExpList = userQuestRepository.findMostRecentCompletedQuest(user, PageRequest.of(0, 1));
+        if (recentExpList.isEmpty()) {
+            return new UserResponse.MyPageResponse.RecentExp();
+        }
+        UserQuest userQuest = recentExpList.get(0);
+        Quest quest = userQuest.getQuest();
+        return UserResponse.MyPageResponse.RecentExp.build(quest);
+    }
+
+    private UserResponse.MyPageResponse.ThisYearExp getThisYearExp(User user) {
+        Integer expAmount = expService.getThisYearExp(user);
+        Integer percent = Math.round((float) expAmount / 9000 * 100);
+        return UserResponse.MyPageResponse.ThisYearExp.build(expAmount, percent);
+    }
+
+    private UserResponse.MyPageResponse.LastYearExp getLastYearExp(User user) {
+        Integer expAmount = expService.getLastYearExp(user);
+        String group = user.getLevel().substring(0, 1);
+        Map.Entry<String, Integer> nextLevelMap = levelService.getNextLevel(group, user.getLevel());
+        Integer nextLevelExp = nextLevelMap.getValue();
+        Integer percent = Math.round((float) expAmount / nextLevelExp * 100);
+        return UserResponse.MyPageResponse.LastYearExp.build(expAmount, percent);
     }
 }

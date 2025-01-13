@@ -62,11 +62,11 @@ public class QuestController {
 
     @GetMapping("/leader")
     public ResponseEntity<DtoResponse<QuestResponse>> getLeaderQuest(@RequestParam Integer month,
-                                                                           @RequestParam Integer employeeNum,
-                                                                           @RequestParam String name,
-                                                                           @RequestParam String questName,
-                                                                           @RequestParam String grade,
-                                                                           @RequestParam Integer expAmount) {
+                                                                     @RequestParam Integer employeeNum,
+                                                                     @RequestParam String name,
+                                                                     @RequestParam String questName,
+                                                                     @RequestParam String grade,
+                                                                     @RequestParam Integer expAmount) {
         QuestRequest.LeaderQuest request = new QuestRequest.LeaderQuest(month, employeeNum, name, questName, grade, expAmount);
         QuestResponse response = questService.getLeaderQuest(request);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
@@ -90,5 +90,40 @@ public class QuestController {
         Long userId = (Long) request.getAttribute("userId");
         List<QuestResponse> completedQuest = userQuestService.getCompletedQuest(userId);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), completedQuest));
+    }
+
+    @GetMapping("/company")
+    public ResponseEntity<DtoResponse<QuestResponse>> getCompanyQuest(@RequestParam Integer month,
+                                                                      @RequestParam Integer day,
+                                                                      @RequestParam Integer employeeNum,
+                                                                      @RequestParam String name,
+                                                                      @RequestParam String projectName,
+                                                                      @RequestParam Integer expAmount) {
+        QuestRequest.CompanyQuest request = new QuestRequest.CompanyQuest(month, day, employeeNum, name, projectName, expAmount);
+        QuestResponse response = questService.getCompanyQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @PatchMapping("/company")
+    public ResponseEntity<DtoResponse<QuestResponse>> updateCompanyQuest(@RequestBody QuestRequest.UpdateCompanyQuest request) {
+        QuestResponse response = questService.updateCompanyQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @GetMapping("/hr")
+    public ResponseEntity<DtoResponse<QuestResponse>> getHRQuest(@RequestParam Boolean isFirstHalf,
+                                                                 @RequestParam Integer employeeNum,
+                                                                 @RequestParam String name,
+                                                                 @RequestParam String grade,
+                                                                 @RequestParam Integer expAmount) {
+        QuestRequest.HRQuest request = new QuestRequest.HRQuest(isFirstHalf, employeeNum, name, grade, expAmount);
+        QuestResponse response = questService.getHRQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @PatchMapping("/hr")
+    public ResponseEntity<DtoResponse<QuestResponse>> updateHRQuest(@RequestBody QuestRequest.UpdateHRQuest request) {
+        QuestResponse response = questService.updateHRQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 }

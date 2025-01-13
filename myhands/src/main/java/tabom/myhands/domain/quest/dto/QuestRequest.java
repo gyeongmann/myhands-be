@@ -27,6 +27,14 @@ public class QuestRequest {
         private LocalDateTime completedAt;
     }
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestCalendar {
+        private Long userId;
+        private Integer year;
+        private Integer month;
+    }
 
     @Getter
     @NoArgsConstructor
@@ -75,9 +83,46 @@ public class QuestRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class QuestCalendar {
-        private Long userId;
-        private Integer year;
+    public static class CompanyQuest {
         private Integer month;
+        private Integer day;
+        private Integer employeeNum;
+        private String name;
+        private String projectName;
+        private Integer expAmount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateCompanyQuest {
+        private Long questId;
+        private Integer month;
+        private Integer day;
+        private Integer employeeNum;
+        private String name;
+        private String projectName;
+        private Integer expAmount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HRQuest {
+        private Boolean isFirstHalf;
+        private Integer employeeNum;
+        private String name;
+        private String grade;
+        private Integer expAmount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateHRQuest {
+        private Long questId;
+        private Boolean isFirstHalf;
+        private String grade;
+        private Integer expAmount;
     }
 }
