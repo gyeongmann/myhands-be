@@ -278,6 +278,20 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
+    public QuestResponse.QuestCalendar getQuestCalendarByParam(HttpServletRequest servletRequest, Integer year, Integer month) {
+        Long userId = (Long) servletRequest.getAttribute("userId");
+        User user = getUserByUserId(userId);
+        List<Quest> questList = userQuestRepository.findQuestsByUserAndCompletedAtYearAndMonth(user, year, month);
+        List<QuestResponse> list = new ArrayList<>();
+        for (Quest quest : questList) {
+            list.add(QuestResponse.from(quest));
+        }
+
+        return groupQuestsByWeekStartingSunday(list, month);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public QuestResponse.QuestStats getQuestStats(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
         User user = getUserByUserId(userId);

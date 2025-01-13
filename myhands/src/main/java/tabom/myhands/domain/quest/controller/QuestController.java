@@ -134,6 +134,13 @@ public class QuestController {
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
+    @GetMapping("/calendar-ios")
+    public ResponseEntity<DtoResponse<QuestResponse.QuestCalendar>> getQuestCalendarByParam(HttpServletRequest servletRequest, @RequestParam Integer year, @RequestParam Integer month) {
+        QuestResponse.QuestCalendar response = questService.getQuestCalendarByParam(servletRequest, year, month);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+
     @GetMapping("/stats")
     public ResponseEntity<DtoResponse<QuestResponse.QuestStats>> getQuestStats(HttpServletRequest request) {
         QuestResponse.QuestStats response = questService.getQuestStats(request);
