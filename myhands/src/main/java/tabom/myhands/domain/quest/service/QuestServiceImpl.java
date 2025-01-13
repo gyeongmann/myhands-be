@@ -1,9 +1,15 @@
 package tabom.myhands.domain.quest.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tabom.myhands.common.infra.redis.RedisService;
+import tabom.myhands.domain.alarm.entity.Alarm;
+import tabom.myhands.domain.alarm.repository.AlarmRepository;
+import tabom.myhands.domain.alarm.service.AlarmService;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.quest.dto.UserQuestRequest;
@@ -18,9 +24,11 @@ import tabom.myhands.domain.user.repository.UserRepository;
 import tabom.myhands.error.errorcode.UserErrorCode;
 import tabom.myhands.error.exception.UserApiException;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +45,9 @@ public class QuestServiceImpl implements QuestService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
     private final UserQuestRepository userQuestRepository;
+    private final AlarmService alarmService;
+    private final AlarmRepository alarmRepository;
+    private final RedisService redisService;
 
     @Override
     public Quest createQuest(QuestRequest.Create request) {
@@ -62,7 +73,7 @@ public class QuestServiceImpl implements QuestService {
 
         String questName = String.format(request.getDepartmentName() + " 직무그룹%d %d주차", request.getJobGroup(), request.getWeekCount());
         Quest quest = createQuest(new QuestRequest.Create("job", questName));
-        LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount()-1);
+        LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount() - 1);
         updateQuest(new QuestRequest.Complete(quest.getQuestId(), "", 0, false, completedDateTime));
         userQuestService.createJobUserQuest(request.getDepartmentName(), request.getJobGroup(), quest);
         return quest;
@@ -81,15 +92,15 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) {
+    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException  {
         Optional<Quest> optionalQuest = questRepository.findByFormattedName(request.getDepartmentName(), request.getJobGroup(), request.getWeekCount());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
         }
         Quest quest = optionalQuest.get();
-        LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount()-1);
+        LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount() - 1);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedDateTime);
-        // TODO: 직무별 퀘스트 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
 
@@ -117,7 +128,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) {
+    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) throws FirebaseMessagingException {
         String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
         Optional<Quest> optionalQuest = questRepository.findQuestByName(formattedQuestName);
         if (optionalQuest.isEmpty()) {
@@ -128,7 +139,7 @@ public class QuestServiceImpl implements QuestService {
                 .withDayOfMonth(LocalDate.of(2025, request.getMonth(), 1).lengthOfMonth());
         LocalDateTime completedAt = LocalDateTime.of(lastDayOfMonth.getYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDayOfMonth(), 23, 59);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
-        // TODO: 리더부여 퀘스트 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
 
@@ -137,12 +148,11 @@ public class QuestServiceImpl implements QuestService {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
 
         if (optionalQuest.isEmpty()) {
-            throw  new IllegalArgumentException("Quest not found");
+            throw new IllegalArgumentException("Quest not found");
         }
         Quest quest = optionalQuest.get();
 
         quest.update(request.getGrade(), request.getExpAmount(), request.getIsCompleted(), request.getCompletedAt());
-        // TODO: 경험치 생성
         return quest;
     }
 
@@ -151,7 +161,7 @@ public class QuestServiceImpl implements QuestService {
     public List<Quest> getUserQuestList(User user) {
         List<UserQuest> userQuests = userQuestService.getUserQuests(user);
         List<Quest> quests = new ArrayList<>();
-        for(UserQuest userQuest : userQuests) {
+        for (UserQuest userQuest : userQuests) {
             quests.add(userQuest.getQuest());
         }
         return quests;
@@ -181,17 +191,17 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) {
+    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) throws FirebaseMessagingException {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
         }
-        
+
         Quest quest = optionalQuest.get();
         LocalDateTime completedAt = LocalDateTime.of(2025, request.getMonth(), request.getDay(), 0, 0);
         String questName = String.format("%s | %s", request.getProjectName(), request.getName());
         quest.updateCompanyProject(questName, request.getExpAmount(), true, completedAt);
-        // TODO: 전사 프로젝트 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
 
@@ -220,7 +230,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) {
+    public QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -230,7 +240,120 @@ public class QuestServiceImpl implements QuestService {
         Integer month = request.getIsFirstHalf() ? 1 : 6;
         LocalDateTime completedAt = LocalDateTime.of(2025, month, 30, 0, 0);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
-        // TODO: 인사평가 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
+    }
+
+
+    private void updateExpAndAlarm(Quest quest) throws FirebaseMessagingException {
+        List<User> users = userQuestRepository.findUsersByQuestId(quest.getQuestId());
+        boolean updateAlarm = false;
+        int preExp = 0;
+
+        for (User u : users) {
+            List<Alarm> alarms = alarmRepository.findAllByQuestIdAndUser(quest.getQuestId(), u);
+            if (alarms.size() > 0) {
+                updateAlarm = true;
+                preExp = alarms.get(0).getExp();
+            }
+
+            log.info("userID: " + u.getUserId() + ", questID: " + quest.getQuestId() + ", 알람 개수: " + String.valueOf(alarms.size()));
+
+            alarmService.createExpAlarm(u, quest, updateAlarm);
+            redisService.updateDepartmentExp(u.getDepartment().getDepartmentId(), preExp, quest.getExpAmount());
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public QuestResponse.QuestCalendar getQuestCalendar(HttpServletRequest servletRequest, QuestRequest.QuestCalendar request) {
+        Long userId = (Long) servletRequest.getAttribute("userId");
+        User user = getUserByUserId(userId);
+        List<Quest> questList = userQuestRepository.findQuestsByUserAndCompletedAtYearAndMonth(user, request.getYear(), request.getMonth());
+        List<QuestResponse> list = new ArrayList<>();
+        for (Quest quest : questList) {
+            list.add(QuestResponse.from(quest));
+        }
+
+        return groupQuestsByWeekStartingSunday(list, request.getMonth());
+    }
+
+    private User getUserByUserId(Long userId) {
+        Optional<User> optionalUser = userRepository.findByUserId(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
+        }
+        return optionalUser.get();
+    }
+
+    private QuestResponse.QuestCalendar groupQuestsByWeekStartingSunday(List<QuestResponse> quests, Integer month) {
+        // 정렬된 리스트를 반환하기 위한 Map
+        List<QuestResponse>[] result;
+
+        // 첫 번째 일요일을 기준으로 주차 구분
+        LocalDate startDate = LocalDate.of(2025, month, 1); // 예시: 2025년 1월 1일을 시작일로 설정
+        LocalDate firstSunday = getFirstSundayOfMonth(startDate); // 해당 월의 첫 번째 일요일 구하기
+
+        // 첫 번째 일요일 이후 매 주 일요일 날짜 구하기
+        List<LocalDate> sundayDates = getSundayDates(firstSunday);
+        int weekCount = sundayDates.size();
+        LocalDate lastSunday = sundayDates.get(sundayDates.size() - 1);
+        if (lastSunday.plusDays(1).getMonthValue() == month) {
+            weekCount++;
+        }
+
+        result = new List[weekCount];
+        for (int i = 0; i < weekCount; i++) {
+            result[i] = new ArrayList<>();
+        }
+
+        // 퀘스트 리스트를 날짜 순으로 정렬
+        quests.sort(Comparator.comparing(QuestResponse::getCompletedAt));
+
+        // Group quests by weeks
+        for (QuestResponse quest : quests) {
+            LocalDate questDate = quest.getCompletedAt().toLocalDate();
+            LocalDate start = startDate;
+            LocalDate end = firstSunday.plusDays(1);
+
+            for (int i = 0; i < weekCount; i++) {
+                if (!questDate.isBefore(start) && questDate.isBefore(end)) {
+                    result[i].add(quest);
+                    break;
+                }
+
+                start = end;
+                end = end.plusWeeks(1);
+            }
+        }
+
+        for (List<QuestResponse> list : result) {
+            list.sort(Comparator.comparing(QuestResponse::getExpAmount).reversed());
+        }
+
+        return QuestResponse.QuestCalendar.from(weekCount, result);
+    }
+
+    private LocalDate getFirstSundayOfMonth(LocalDate date) {
+        for (LocalDate today = date; today.isBefore(date.plusWeeks(1)); today = today.plusDays(1)) {
+            if (today.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                return today;
+            }
+        }
+        throw new IllegalStateException("No Sunday found in the given month!");
+    }
+
+    private List<LocalDate> getSundayDates(LocalDate firstSunday) {
+        // 첫 번째 일요일을 시작으로, 매 주 일요일 날짜를 반환
+        List<LocalDate> sundayDates = new ArrayList<>();
+        LocalDate currentSunday = firstSunday;
+
+        while (currentSunday.getMonthValue() == firstSunday.getMonthValue()) {
+            sundayDates.add(currentSunday);
+            currentSunday = currentSunday.plusWeeks(1);
+        }
+
+        return sundayDates;
+
     }
 }

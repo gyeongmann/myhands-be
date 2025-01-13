@@ -2,9 +2,11 @@ package tabom.myhands.domain.quest.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import tabom.myhands.domain.quest.entity.Quest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -27,5 +29,30 @@ public class QuestResponse {
                 quest.getIsCompleted(),
                 quest.getCompletedAt()
         );
+    }
+
+    @Override
+    public String toString() {
+        return "QuestResponse{" +
+                "questId=" + questId +
+                ", questType='" + questType + '\'' +
+                ", name='" + name + '\'' +
+                ", grade='" + grade + '\'' +
+                ", expAmount=" + expAmount +
+                ", isCompleted=" + isCompleted +
+                ", completedAt=" + completedAt +
+                '}';
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestCalendar {
+        private Integer weekCount;
+        private List<QuestResponse>[] questList;
+
+        public static QuestCalendar from(Integer weekCount, List<QuestResponse>[] questList) {
+            return new QuestCalendar(weekCount, questList);
+        }
     }
 }
