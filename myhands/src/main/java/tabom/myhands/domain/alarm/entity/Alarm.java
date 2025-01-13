@@ -38,6 +38,8 @@ public class Alarm {
 
     private Long boardId;
 
+    private Long questId;
+
     private int exp;
 
     @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "DATETIME")
@@ -54,13 +56,14 @@ public class Alarm {
     }
 
     public static Alarm ExpAlarmCreate(User user, Quest quest) {
-        String title = quest.getName() + "!";
+        String title = quest.getName().split("\\|")[0];
 
         return Alarm.builder()
                 .user(user)
                 .title(title)
                 .category(false)
                 .exp(quest.getExpAmount())
+                .questId(quest.getQuestId())
                 .build();
     }
 }

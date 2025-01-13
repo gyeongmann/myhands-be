@@ -71,17 +71,20 @@ public class AlarmServiceImpl implements AlarmService {
             Alarm alarm = Alarm.BoardAlarmCreate(user, board);
             alarmRepository.save(alarm);
             if(user.getDeviceToken() != null) {
-                sendMessage(user, alarm);
+                sendMessage(user, alarm, false);
             }
         }
     }
 
     @Override
     @Transactional
-    public void createExpAlarm(User user, Quest quest) throws FirebaseMessagingException {
+    public void createExpAlarm(User user, Quest quest, boolean updateAlarm) throws FirebaseMessagingException {
         Alarm alarm = Alarm.ExpAlarmCreate(user, quest);
         alarmRepository.save(alarm);
-        sendMessage(user, alarm);
+
+        if(user.getDeviceToken() != null) {
+            sendMessage(user, alarm, updateAlarm);
+        }
     }
 
     private String formatCreatedAt(LocalDateTime d, boolean lastDay) {
@@ -103,11 +106,14 @@ public class AlarmServiceImpl implements AlarmService {
         return diffMin + "분 전";
     }
 
-    public void sendMessage(User user, Alarm alarm) throws FirebaseMessagingException {
+    public void sendMessage(User user, Alarm alarm, boolean updateAlarm) throws FirebaseMessagingException {
         String title = "공지사항";
         String body = alarm.getTitle();
 
-        if(!alarm.isCategory()) {
+        if(updateAlarm) {
+            title = "경험치 변경";
+            body = body + "\n" + alarm.getExp() + " do로 변경되었습니다.";
+        } else if(!alarm.isCategory()) {
             title = "경험치 획득";
             body = body + "\n" + alarm.getExp() + " do를 획득하셨습니다.";
         }
@@ -121,6 +127,9 @@ public class AlarmServiceImpl implements AlarmService {
                 .build();
 
         String response = FirebaseMessaging.getInstance().send(message);
+        log.info(title);
+        log.info(body);
+        log.info(response);
     }
 
 }

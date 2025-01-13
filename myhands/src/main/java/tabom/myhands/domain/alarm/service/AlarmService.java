@@ -10,5 +10,5 @@ public interface AlarmService {
     void deleteAlarm(Long userId);
     AlarmResponse.AlarmList getAlarmList(Long userId);
     void createBoardAlarm(Board board) throws FirebaseMessagingException;
-    void createExpAlarm(User user, Quest quest) throws FirebaseMessagingException;
+    void createExpAlarm(User user, Quest quest, boolean updateAlarm) throws FirebaseMessagingException;
 }

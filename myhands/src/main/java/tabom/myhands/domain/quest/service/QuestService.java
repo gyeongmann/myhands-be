@@ -1,5 +1,6 @@
 package tabom.myhands.domain.quest.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.quest.entity.Quest;
@@ -19,17 +20,17 @@ public interface QuestService {
 
     QuestResponse getWeekCountJobQuest(QuestRequest.JobQuest request);
 
-    QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request);
+    QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException;
 
     QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request);
 
-    QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request);
+    QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) throws FirebaseMessagingException;
 
     QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request);
 
-    QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request);
+    QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) throws FirebaseMessagingException;
 
     QuestResponse getHRQuest(QuestRequest.HRQuest request);
 
-    QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request);
+    QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException;
 }
