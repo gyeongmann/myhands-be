@@ -18,6 +18,7 @@ import tabom.myhands.domain.user.repository.UserRepository;
 import tabom.myhands.error.errorcode.UserErrorCode;
 import tabom.myhands.error.exception.UserApiException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -78,12 +79,7 @@ public class UserQuestServiceImpl implements UserQuestService {
 
     @Override
     public List<QuestResponse> getQuests(Long userId) {
-        Optional<User> optionalUser = userRepository.findByUserId(userId);
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUser(userId);
         List<UserQuest> userQuests = getUserQuests(user);
         List<QuestResponse> quests = new ArrayList<>();
         for (UserQuest userQuest : userQuests) {
@@ -95,20 +91,21 @@ public class UserQuestServiceImpl implements UserQuestService {
 
     @Override
     public List<QuestResponse> getCompletedQuest(Long userId) {
+        User user = getUser(userId);
+        List<QuestResponse> completedQuests = new ArrayList<>();
+        // TODO: 임시 날짜 설정
+        List<Quest> quests = userQuestRepository.findQuestsByUserCompletedAtDESC(user, LocalDateTime.of(2025, 2, 1, 0, 0));
+        for (Quest quest : quests) {
+            completedQuests.add(QuestResponse.from(quest));
+        }
+        return completedQuests;
+    }
+
+    private User getUser(Long userId) {
         Optional<User> optionalUser = userRepository.findByUserId(userId);
         if (optionalUser.isEmpty()) {
             throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
         }
-
-        User user = optionalUser.get();
-        List<QuestResponse> completedQuests = new ArrayList<>();
-        List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
-        for (UserQuest userQuest : userQuests) {
-            Quest quest = userQuest.getQuest();
-            if (quest.getIsCompleted()) {
-                completedQuests.add(QuestResponse.from(quest));
-            }
-        }
-        return completedQuests;
+        return optionalUser.get();
     }
 }

@@ -18,8 +18,19 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
     @Query("SELECT uq FROM UserQuest uq JOIN FETCH uq.quest WHERE uq.user = :user")
     List<UserQuest> findByUserWithQuest(@Param("user") User user);
 
-    @Query("SELECT uq.user FROM UserQuest uq WHERE uq.quest.id = :questId")
+    @Query("SELECT uq.user FROM UserQuest uq WHERE uq.quest.questId = :questId")
     List<User> findUsersByQuestId(@Param("questId") Long questId);
+
+    @Query("SELECT q FROM UserQuest uq " +
+            "JOIN uq.quest q " +
+            "WHERE uq.user = :user " +
+            "AND q.isCompleted = TRUE " +
+            "AND q.expAmount > 0 " +
+            "AND q.completedAt < :endDate " +  // 파라미터로 전달되는 날짜
+            "ORDER BY q.completedAt DESC")
+    List<Quest> findQuestsByUserCompletedAtDESC(@Param("user") User user,
+                                                @Param("endDate") LocalDateTime endDate);
+
 
     @Query("SELECT uq FROM UserQuest uq " +
             "JOIN FETCH uq.quest q " +
