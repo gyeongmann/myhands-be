@@ -27,10 +27,7 @@ import tabom.myhands.error.exception.UserApiException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -48,6 +45,7 @@ public class QuestServiceImpl implements QuestService {
     private final AlarmService alarmService;
     private final AlarmRepository alarmRepository;
     private final RedisService redisService;
+    private final ExpService expService;
 
     @Override
     public Quest createQuest(QuestRequest.Create request) {
@@ -277,6 +275,94 @@ public class QuestServiceImpl implements QuestService {
 
         return groupQuestsByWeekStartingSunday(list, request.getMonth());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public QuestResponse.QuestStats getQuestStats(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        User user = getUserByUserId(userId);
+        List<String> challenges = getChallenges(user);
+        Integer challengeCount = challenges.size();
+        Integer questRate = getQuestRate(user);
+        Integer maxCount = getMaxCount(user);
+        Map<String, Integer> expHistory = getExpHistory(user);
+        Integer historyCount = expHistory.size();
+        return QuestResponse.QuestStats.from(challengeCount, challenges, questRate, maxCount, historyCount, expHistory);
+    }
+
+    private Map<String, Integer> getExpHistory(User user) {
+        int year = LocalDate.now().getYear();
+        Map<String, Integer> expHistory = new HashMap<>();
+        for (int i = 1; i <= 4; i++) {
+            Integer yearExp = expService.getYearExp(user, year - i);
+            expHistory.put(String.valueOf(year - i), yearExp);
+        }
+        return expHistory;
+    }
+
+    private Integer getMaxCount(User user) {
+        // TODO: 임시 값 설정
+        LocalDateTime startDate = LocalDateTime.of(2025, 2, 1, 0, 0, 0);
+        LocalDateTime endDate = startDate.withHour(23).withMinute(59).withSecond(59);
+        while (startDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            startDate = startDate.minusDays(1);
+        }
+
+        LocalDate joinedAt = user.getJoinedAt();
+        LocalDateTime joinedDateTime = LocalDateTime.of(joinedAt.getYear(), joinedAt.getMonth(), joinedAt.getDayOfMonth(), 0, 0, 0);
+        int currentCount = 0;
+        int maxCount = 0;
+        while (joinedDateTime.isBefore(startDate)) {
+            if (!userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).isEmpty()) {
+                currentCount++; // 완료된 퀘스트가 있으면 연속 증가
+                maxCount = Math.max(maxCount, currentCount); // 최대값 갱신
+            } else {
+                currentCount = 0;
+            }
+
+            endDate = startDate;
+            startDate = startDate.minusWeeks(1);
+        }
+        return maxCount;
+    }
+
+    private Integer getQuestRate(User user) {
+        int totalQuestCount = userQuestRepository.findAllQuestsByYear(user, LocalDate.now().getYear()).size();
+        int completedQuestCount = userQuestRepository.findCompletedQuestsByYear(user, LocalDate.now().getYear()).size();
+
+        return Math.round((float) completedQuestCount / totalQuestCount * 100);
+    }
+
+    private List<String> getChallenges(User user) {
+        // TODO: 임시 값 설정
+        LocalDateTime startDate = LocalDateTime.of(2025, 2, 1, 0, 0, 0);
+        LocalDateTime endDate = startDate.withHour(23).withMinute(59).withSecond(59);
+        while (startDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            startDate = startDate.minusDays(1);
+        }
+
+        List<Quest> questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+        List<String> challenges = new ArrayList<>();
+        while (!questsBetweenDates.isEmpty()) {
+            Quest quest = questsBetweenDates.get(0);
+            if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
+                challenges.add("ETC");
+            } else if (quest.getQuestType().equals("leader")) {
+                if (quest.getGrade().equals("Max")) {
+                    challenges.add("MAX");
+                } else if (quest.getGrade().equals("Median")) {
+                    challenges.add("MED");
+                }
+            } else {
+                challenges.add(quest.getGrade());
+            }
+            endDate = startDate.minusSeconds(1);
+            startDate = startDate.minusWeeks(1);
+            questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+        }
+        return challenges;
+    }
+
 
     private User getUserByUserId(Long userId) {
         Optional<User> optionalUser = userRepository.findByUserId(userId);
