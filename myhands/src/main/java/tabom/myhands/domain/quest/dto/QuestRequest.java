@@ -31,7 +31,6 @@ public class QuestRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class QuestCalendar {
-        private Long userId;
         private Integer year;
         private Integer month;
     }

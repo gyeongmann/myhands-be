@@ -127,4 +127,10 @@ public class QuestController {
         QuestResponse response = questService.updateHRQuest(request);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<DtoResponse<QuestResponse.QuestCalendar>> getQuestCalendar(HttpServletRequest servletRequest, @RequestBody QuestRequest.QuestCalendar request) {
+        QuestResponse.QuestCalendar response = questService.getQuestCalendar(servletRequest, request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
 }
