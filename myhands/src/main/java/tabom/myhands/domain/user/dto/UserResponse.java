@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.user.entity.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class UserResponse {
 
@@ -110,6 +112,89 @@ public class UserResponse {
                     .department(user.getDepartment().getName())
                     .jobGroup(user.getJobGroup())
                     .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MyPageResponse {
+        private Fortune fortune;
+        private LevelRate levelRate;
+        private RecentExp recentExp;
+        private ThisYearExp thisYearExp;
+        private LastYearExp lastYearExp;
+
+        public static MyPageResponse build(Fortune fortune, LevelRate levelRate, RecentExp recentExp, ThisYearExp thisYearExp, LastYearExp lastYearExp) {
+            return new MyPageResponse(fortune, levelRate, recentExp, thisYearExp, lastYearExp);
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Fortune {
+            private LocalDate date;
+            private String contents;
+
+            public static Fortune build(LocalDate date, String contents) {
+                return new Fortune(date, contents);
+            }
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class LevelRate {
+            private String currentLevel;
+            private int currentExp;
+            private String nextLevel;
+            private int leftExp;
+            private int percent;
+
+            public static LevelRate build(String currentLevel, int currentExp, String nextLevel, int leftExp, int percent) {
+                return new LevelRate(currentLevel, currentExp, nextLevel, leftExp, percent);
+            }
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class RecentExp {
+            private Long questId;
+            private String questType; // job, leader, company
+            private String name;
+            private String grade;
+            private Integer expAmount;
+            private Boolean isCompleted;
+            private LocalDateTime completedAt;
+
+            public static RecentExp build(Quest quest) {
+                return new RecentExp(quest.getQuestId(), quest.getQuestType(), quest.getName(), quest.getGrade(), quest.getExpAmount(), quest.getIsCompleted(), quest.getCompletedAt());
+            }
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class ThisYearExp {
+            private int expAmount;
+            private int percent;
+
+            public static ThisYearExp build(Integer expAmount, Integer percent) {
+                return new ThisYearExp(expAmount, percent);
+            }
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class LastYearExp {
+            private int expAmount;
+            private int percent;
+
+            public static LastYearExp build(Integer expAmount, Integer percent) {
+                return new LastYearExp(expAmount, percent);
+            }
         }
     }
 }

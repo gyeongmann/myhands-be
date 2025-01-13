@@ -26,6 +26,7 @@ public class Quest {
 
     private String grade;
 
+    @Column(nullable = false)
     private Integer expAmount;
 
     private Boolean isCompleted;
@@ -36,12 +37,20 @@ public class Quest {
         return Quest.builder()
                 .questType(questType)
                 .name(name)
+                .expAmount(0)
                 .isCompleted(false) // 기본값 설정
                 .build();
     }
 
     public void update(String grade, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
         this.grade = grade;
+        this.expAmount = expAmount;
+        this.isCompleted = isCompleted;
+        this.completedAt = completedAt;
+    }
+
+    public void updateCompanyProject(String name, Integer expAmount, Boolean isCompleted, LocalDateTime completedAt) {
+        this.name = name;
         this.expAmount = expAmount;
         this.isCompleted = isCompleted;
         this.completedAt = completedAt;

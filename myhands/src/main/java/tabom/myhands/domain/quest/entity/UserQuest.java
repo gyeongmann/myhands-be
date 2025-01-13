@@ -12,6 +12,11 @@ import tabom.myhands.domain.user.entity.User;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(name = "unique_user_quest", columnNames = {"user_id", "quest_id"})
+        }
+)
 public class UserQuest {
 
     @Id

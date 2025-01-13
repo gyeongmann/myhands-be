@@ -16,4 +16,5 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
                                         @Param("jobGroupNumber") Integer jobGroupNumber,
                                         @Param("weekCount") Integer weekCount);
 
+    Optional<Quest> findQuestByName(String name);
 }
