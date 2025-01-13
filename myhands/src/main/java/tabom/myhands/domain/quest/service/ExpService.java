@@ -10,4 +10,5 @@ public interface ExpService {
 
     Integer getLastYearExp(User user);
 
+    Integer getYearExp(User user, Integer year);
 }

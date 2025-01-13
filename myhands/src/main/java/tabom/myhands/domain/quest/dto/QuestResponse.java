@@ -7,6 +7,7 @@ import tabom.myhands.domain.quest.entity.Quest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @AllArgsConstructor
@@ -53,6 +54,22 @@ public class QuestResponse {
 
         public static QuestCalendar from(Integer weekCount, List<QuestResponse>[] questList) {
             return new QuestCalendar(weekCount, questList);
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestStats {
+        private Integer challengeCount;
+        private List<String> resultList;
+        private Integer questRate;
+        private Integer maxCount;
+        private Integer historySize;
+        private Map<String, Integer> expHistory;
+
+        public static QuestStats from(Integer challengeCount, List<String> resultList, Integer questRate, Integer maxCount, Integer historySize, Map<String, Integer> expHistory) {
+            return new QuestStats(challengeCount, resultList, questRate, maxCount, historySize, expHistory);
         }
     }
 }

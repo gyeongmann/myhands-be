@@ -57,4 +57,17 @@ public class ExpServiceImpl implements ExpService {
         }
         return totalExp;
     }
+
+    @Override
+    public Integer getYearExp(User user, Integer year) {
+        LocalDateTime startDate = LocalDateTime.of(year, 1, 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(year + 1, 1, 1, 23, 59, 59).minusDays(1);
+        List<Quest> quests = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+
+        Integer totalExp = 0;
+        for (Quest quest : quests) {
+            totalExp += quest.getExpAmount();
+        }
+        return totalExp;
+    }
 }

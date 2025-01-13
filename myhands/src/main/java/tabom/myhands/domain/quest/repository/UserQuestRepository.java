@@ -50,5 +50,29 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
     List<Quest> findQuestsByUserAndCompletedAtYearAndMonth(@Param("user") User user,
                                                            @Param("year") int year,
                                                            @Param("month") int month);
+    @Query("SELECT q FROM UserQuest uq " +
+            "JOIN uq.quest q " +
+            "WHERE uq.user = :user " +
+            "AND q.completedAt BETWEEN :startDate AND :endDate " +
+            "ORDER BY q.expAmount DESC")
+    List<Quest> findQuestsBetweenDates(@Param("user") User user,
+                                       @Param("startDate") LocalDateTime startDate,
+                                       @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT uq FROM UserQuest uq " +
+            "JOIN FETCH uq.quest q " +
+            "WHERE uq.user = :user " +
+            "AND FUNCTION('YEAR', q.completedAt) = :year " +
+            "ORDER BY q.completedAt ASC")
+    List<UserQuest> findAllQuestsByYear(@Param("user") User user, @Param("year") int year);
+
+    @Query("SELECT uq FROM UserQuest uq " +
+            "JOIN FETCH uq.quest q " +
+            "WHERE uq.user = :user " +
+            "AND FUNCTION('YEAR', q.completedAt) = :year " +
+            "AND q.isCompleted = true " +
+            "AND q.expAmount > 0 " +
+            "ORDER BY q.completedAt ASC")
+    List<UserQuest> findCompletedQuestsByYear(@Param("user") User user, @Param("year") int year);
 
 }
