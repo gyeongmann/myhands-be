@@ -70,7 +70,9 @@ public class AlarmServiceImpl implements AlarmService {
         for(User user : users) {
             Alarm alarm = Alarm.BoardAlarmCreate(user, board);
             alarmRepository.save(alarm);
-            sendMessage(user, alarm);
+            if(user.getDeviceToken() != null) {
+                sendMessage(user, alarm);
+            }
         }
     }
 
