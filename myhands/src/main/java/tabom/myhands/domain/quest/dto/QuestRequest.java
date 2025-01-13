@@ -52,6 +52,29 @@ public class QuestRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class LeaderQuest {
+        private Integer month;
+        private Integer employeeNum;
+        private String name;
+        private String questName;
+        private String grade;
+        private Integer expAmount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateLeaderQuest {
+        private Integer month;
+        private String name;
+        private String questName;
+        private String grade;
+        private Integer expAmount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class QuestCalendar {
         private Long userId;
         private Integer year;

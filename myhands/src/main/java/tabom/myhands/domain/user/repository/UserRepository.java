@@ -32,4 +32,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAll();
 
     List<User> findUsersByDepartmentAndJobGroup(Department department, Integer jobGroup);
+
+    Optional<User> findUserByEmployeeNumAndName(Integer employeeNum, String name);
 }

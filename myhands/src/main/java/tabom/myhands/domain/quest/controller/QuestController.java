@@ -45,18 +45,36 @@ public class QuestController {
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.CREATED, responseProperties.getSuccess(), response));
     }
 
-    @PatchMapping("/job")
-    public ResponseEntity<DtoResponse<QuestResponse>> updateWeekCountJobQuest(@RequestBody QuestRequest.UpdateJobQuest request) {
-        QuestResponse response = questService.updateWeekCountJobQuest(request);
-        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
-    }
-
     @GetMapping("/job")
     public ResponseEntity<DtoResponse<QuestResponse>> getWeekCountJobQuest(@RequestParam String departmentName,
                                                                            @RequestParam Integer jobGroup,
                                                                            @RequestParam Integer weekCount) {
         QuestRequest.JobQuest request = new QuestRequest.JobQuest(departmentName, jobGroup, weekCount);
         QuestResponse response = questService.getWeekCountJobQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @PatchMapping("/job")
+    public ResponseEntity<DtoResponse<QuestResponse>> updateWeekCountJobQuest(@RequestBody QuestRequest.UpdateJobQuest request) {
+        QuestResponse response = questService.updateWeekCountJobQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @GetMapping("/leader")
+    public ResponseEntity<DtoResponse<QuestResponse>> getLeaderQuest(@RequestParam Integer month,
+                                                                           @RequestParam Integer employeeNum,
+                                                                           @RequestParam String name,
+                                                                           @RequestParam String questName,
+                                                                           @RequestParam String grade,
+                                                                           @RequestParam Integer expAmount) {
+        QuestRequest.LeaderQuest request = new QuestRequest.LeaderQuest(month, employeeNum, name, questName, grade, expAmount);
+        QuestResponse response = questService.getLeaderQuest(request);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
+    }
+
+    @PatchMapping("/leader")
+    public ResponseEntity<DtoResponse<QuestResponse>> updateLeaderQuest(@RequestBody QuestRequest.UpdateLeaderQuest request) {
+        QuestResponse response = questService.updateLeaderQuest(request);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
