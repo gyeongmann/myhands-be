@@ -15,4 +15,7 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Modifying
     @Query("DELETE FROM Alarm a WHERE a.user = :user")
     void deleteAllByUser(@Param("user") User user);
+
+    @Query("SELECT a FROM Alarm a WHERE a.questId = :questId AND a.user = :user")
+    List<Alarm> findAllByQuestIdAndUser(@Param("questId") Long questId, @Param("user") User user);
 }

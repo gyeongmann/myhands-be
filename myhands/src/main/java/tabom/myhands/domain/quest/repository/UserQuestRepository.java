@@ -18,6 +18,9 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
     @Query("SELECT uq FROM UserQuest uq JOIN FETCH uq.quest WHERE uq.user = :user")
     List<UserQuest> findByUserWithQuest(@Param("user") User user);
 
+    @Query("SELECT uq.user FROM UserQuest uq WHERE uq.quest.id = :questId")
+    List<User> findUsersByQuestId(@Param("questId") Long questId);
+
     @Query("SELECT uq FROM UserQuest uq " +
             "JOIN FETCH uq.quest q " +
             "WHERE uq.user = :user " +

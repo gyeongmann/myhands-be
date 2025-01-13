@@ -41,14 +41,14 @@ public class RedisService {
         return "blacklist:" + token;
     }
 
-    private void addDepartmentExp(int departmentId, int exp) {
+    public void updateDepartmentExp(int departmentId, int preExp, int newExp) {
         ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
         String key = "department:" + departmentId + ":exp";
 
         String beforeExp = valueOps.get(key);
-        int newExp = (beforeExp != null ? Integer.parseInt(beforeExp) : 0) + exp;
+        int totalExp = (beforeExp != null ? Integer.parseInt(beforeExp) : 0) - preExp + newExp;
 
-        valueOps.set(key, String.valueOf(newExp));
+        valueOps.set(key, String.valueOf(totalExp));
     }
 
     @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")

@@ -1,10 +1,15 @@
 package tabom.myhands.domain.quest.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tabom.myhands.common.infra.redis.RedisService;
+import tabom.myhands.domain.alarm.entity.Alarm;
+import tabom.myhands.domain.alarm.repository.AlarmRepository;
+import tabom.myhands.domain.alarm.service.AlarmService;
 import tabom.myhands.domain.quest.dto.QuestRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.quest.dto.UserQuestRequest;
@@ -40,6 +45,9 @@ public class QuestServiceImpl implements QuestService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
     private final UserQuestRepository userQuestRepository;
+    private final AlarmService alarmService;
+    private final AlarmRepository alarmRepository;
+    private final RedisService redisService;
 
     @Override
     public Quest createQuest(QuestRequest.Create request) {
@@ -84,7 +92,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) {
+    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException  {
         Optional<Quest> optionalQuest = questRepository.findByFormattedName(request.getDepartmentName(), request.getJobGroup(), request.getWeekCount());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -92,7 +100,7 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = optionalQuest.get();
         LocalDateTime completedDateTime = START_DATE_TIME.plusWeeks(request.getWeekCount() - 1);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedDateTime);
-        // TODO: 직무별 퀘스트 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
 
@@ -120,7 +128,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) {
+    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) throws FirebaseMessagingException {
         String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
         Optional<Quest> optionalQuest = questRepository.findQuestByName(formattedQuestName);
         if (optionalQuest.isEmpty()) {
@@ -131,7 +139,7 @@ public class QuestServiceImpl implements QuestService {
                 .withDayOfMonth(LocalDate.of(2025, request.getMonth(), 1).lengthOfMonth());
         LocalDateTime completedAt = LocalDateTime.of(lastDayOfMonth.getYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDayOfMonth(), 23, 59);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
-        // TODO: 리더부여 퀘스트 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
 
@@ -145,7 +153,6 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = optionalQuest.get();
 
         quest.update(request.getGrade(), request.getExpAmount(), request.getIsCompleted(), request.getCompletedAt());
-        // TODO: 경험치 생성
         return quest;
     }
 
@@ -184,7 +191,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) {
+    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) throws FirebaseMessagingException {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -194,7 +201,7 @@ public class QuestServiceImpl implements QuestService {
         LocalDateTime completedAt = LocalDateTime.of(2025, request.getMonth(), request.getDay(), 0, 0);
         String questName = String.format("%s | %s", request.getProjectName(), request.getName());
         quest.updateCompanyProject(questName, request.getExpAmount(), true, completedAt);
-        // TODO: 전사 프로젝트 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
 
@@ -223,7 +230,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) {
+    public QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -233,8 +240,27 @@ public class QuestServiceImpl implements QuestService {
         Integer month = request.getIsFirstHalf() ? 1 : 6;
         LocalDateTime completedAt = LocalDateTime.of(2025, month, 30, 0, 0);
         quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
-        // TODO: 인사평가 경험치 생성
+        updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
+    }
+
+
+    private void updateExpAndAlarm(Quest quest) throws FirebaseMessagingException {
+        List<User> users = userQuestRepository.findUsersByQuestId(quest.getQuestId());
+        boolean updateAlarm = false;
+        int preExp = 0;
+
+        for(User u : users) {
+            List<Alarm> alarms = alarmRepository.findAllByQuestIdAndUser(quest.getQuestId(), u);
+            if(alarms.size() > 0) {
+                updateAlarm = true;
+                preExp = alarms.get(0).getExp();
+            }
+
+            log.info("userID: " + u.getUserId() + ", questID: " + quest.getQuestId() + ", 알람 개수: "+ String.valueOf(alarms.size()));
+
+            alarmService.createExpAlarm(u, quest, updateAlarm);
+            redisService.updateDepartmentExp(u.getDepartment().getDepartmentId(), preExp, quest.getExpAmount());
     }
 
     @Override
@@ -327,5 +353,6 @@ public class QuestServiceImpl implements QuestService {
         }
 
         return sundayDates;
+
     }
 }
