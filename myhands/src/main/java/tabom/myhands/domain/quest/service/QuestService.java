@@ -36,4 +36,6 @@ public interface QuestService {
     QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException;
 
     QuestResponse.QuestCalendar getQuestCalendar(HttpServletRequest servletRequest, QuestRequest.QuestCalendar request);
+
+    QuestResponse.QuestStats getQuestStats(HttpServletRequest request);
 }
