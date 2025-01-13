@@ -250,17 +250,18 @@ public class QuestServiceImpl implements QuestService {
         boolean updateAlarm = false;
         int preExp = 0;
 
-        for(User u : users) {
+        for (User u : users) {
             List<Alarm> alarms = alarmRepository.findAllByQuestIdAndUser(quest.getQuestId(), u);
-            if(alarms.size() > 0) {
+            if (alarms.size() > 0) {
                 updateAlarm = true;
                 preExp = alarms.get(0).getExp();
             }
 
-            log.info("userID: " + u.getUserId() + ", questID: " + quest.getQuestId() + ", 알람 개수: "+ String.valueOf(alarms.size()));
+            log.info("userID: " + u.getUserId() + ", questID: " + quest.getQuestId() + ", 알람 개수: " + String.valueOf(alarms.size()));
 
             alarmService.createExpAlarm(u, quest, updateAlarm);
             redisService.updateDepartmentExp(u.getDepartment().getDepartmentId(), preExp, quest.getExpAmount());
+        }
     }
 
     @Override
