@@ -1,6 +1,5 @@
 package tabom.myhands.domain.board.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,14 +18,14 @@ public class BoardResponse {
     public static class Detail{
         private String title;
         private String content;
-        @JsonFormat(pattern = "yyyy.MM.dd HH:mm" ,timezone = "Asia/Seoul")
-        private LocalDateTime createdAt;
+        private String createdAt;
 
         public static BoardResponse.Detail build(Board board) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             return BoardResponse.Detail.builder()
                     .title(board.getTitle())
                     .content(board.getContent())
-                    .createdAt(board.getCreatedAt())
+                    .createdAt(board.getCreatedAt().format(formatter))
                     .build();
         }
     }
@@ -60,7 +59,8 @@ public class BoardResponse {
             } else if (duration.toHours() < 24) {
                 return duration.toHours() + "시간 전";
             } else {
-                return createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")); // 그 외는 날짜로 표시
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+                return createdAt.format(formatter); // 그 외는 날짜로 표시
             }
         }
     }
