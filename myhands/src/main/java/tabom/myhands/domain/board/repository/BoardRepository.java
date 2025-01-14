@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findByBoardId(Long id);
 
+    Optional<Board> findByGoogleId(Long id);
+
     @Query(value = "SELECT * FROM board ORDER BY created_at DESC LIMIT :size", nativeQuery = true)
     List<Board> findFirstPage(@Param("size") int size);
 
@@ -25,4 +27,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query(value = "SELECT * FROM board WHERE title LIKE CONCAT('%', :word, '%') AND board_id < :lastId ORDER BY created_at DESC LIMIT :size", nativeQuery = true)
     List<Board> findWordLastId(@Param("word") String word, @Param("lastId") Long lastId, @Param("size") int size);
+
+    @Query("SELECT MAX(b.googleId) FROM Board b WHERE b.googleId IS NOT NULL")
+    Long findMaxGoogleId();
 }

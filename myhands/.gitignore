@@ -42,3 +42,6 @@ application-jwt.properties
 
 ### firebase ###
 myhandsFirebaseKey.json
+
+### googlet sheet ###
+googleSheetKey.json
