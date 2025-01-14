@@ -36,6 +36,9 @@ public class Board {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @Column(name = "google_id")
+    private Long googleId;
+
     public static Board build(BoardRequest.Create request, Long userId) {
         return Board.builder()
                 .userId(userId)
@@ -43,6 +46,20 @@ public class Board {
                 .content(request.getContent())
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+
+    public static Board googleBoardBuild(BoardRequest.Edit request, Long userId) {
+        return Board.builder()
+                .userId(userId)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .googleId(request.getBoardId())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public void updateGoogleId(Long googleId) {
+        this.googleId = googleId;
     }
 
     public void edit(BoardRequest.Edit request) {
