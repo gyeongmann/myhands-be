@@ -38,4 +38,6 @@ public interface QuestService {
     QuestResponse.QuestCalendar getQuestCalendar(HttpServletRequest servletRequest, QuestRequest.QuestCalendar request);
 
     QuestResponse.QuestStats getQuestStats(HttpServletRequest request);
+
+    QuestResponse.QuestCalendar getQuestCalendarByParam(HttpServletRequest servletRequest, Integer year, Integer month);
 }
