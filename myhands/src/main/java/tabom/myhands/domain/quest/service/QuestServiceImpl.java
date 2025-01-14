@@ -270,7 +270,13 @@ public class QuestServiceImpl implements QuestService {
         List<Quest> questList = userQuestRepository.findQuestsByUserAndCompletedAtYearAndMonth(user, request.getYear(), request.getMonth());
         List<QuestResponse> list = new ArrayList<>();
         for (Quest quest : questList) {
-            list.add(QuestResponse.from(quest));
+            String name = quest.getName();
+            if (name.endsWith("주차")) {
+                name = name.substring(0, name.length() - 4);
+            } else if (name.endsWith(user.getName())) {
+                name = name.split(" " + "\\|")[0];
+            }
+            list.add(QuestResponse.from(quest, name));
         }
 
         return groupQuestsByWeekStartingSunday(list, request.getMonth());
@@ -284,7 +290,13 @@ public class QuestServiceImpl implements QuestService {
         List<Quest> questList = userQuestRepository.findQuestsByUserAndCompletedAtYearAndMonth(user, year, month);
         List<QuestResponse> list = new ArrayList<>();
         for (Quest quest : questList) {
-            list.add(QuestResponse.from(quest));
+            String name = quest.getName();
+            if (name.endsWith("주차")) {
+                name = name.substring(0, name.length() - 4);
+            } else if (name.endsWith(user.getName())) {
+                name = name.split(" \\|")[0];
+            }
+            list.add(QuestResponse.from(quest, name));
         }
 
         return groupQuestsByWeekStartingSunday(list, month);
@@ -312,7 +324,7 @@ public class QuestServiceImpl implements QuestService {
             }
             challengeCount++;
         }
-        return challengeCount+1;
+        return challengeCount + 1;
     }
 
     private Map<String, Integer> getExpHistory(User user) {
@@ -368,15 +380,12 @@ public class QuestServiceImpl implements QuestService {
 
         List<String> challenges = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            System.out.println("startDate.toString() = " + startDate);
-            System.out.println("endDate.toString() = " + endDate);
             List<Quest> questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
             if (questsBetweenDates.isEmpty()) {
                 challenges.add("FAIL");
                 continue;
             }
             Quest quest = questsBetweenDates.get(0);
-            System.out.println("QuestResponse.from(quest).toString() = " + QuestResponse.from(quest).toString());
             if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
                 challenges.add("ETC");
             } else {
@@ -385,24 +394,6 @@ public class QuestServiceImpl implements QuestService {
             startDate = startDate.plusWeeks(1);
             endDate = endDate.plusWeeks(1);
         }
-//        List<String> challenges = new ArrayList<>();
-//        while (!questsBetweenDates.isEmpty()) {
-//            Quest quest = questsBetweenDates.get(0);
-//            if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
-//                challenges.add("ETC");
-//            } else if (quest.getQuestType().equals("leader")) {
-//                if (quest.getGrade().equals("Max")) {
-//                    challenges.add("MAX");
-//                } else if (quest.getGrade().equals("Median")) {
-//                    challenges.add("MED");
-//                }
-//            } else {
-//                challenges.add(quest.getGrade());
-//            }
-//            endDate = startDate.minusSeconds(1);
-//            startDate = startDate.minusWeeks(1);
-//            questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
-//        }
         return challenges;
     }
 
