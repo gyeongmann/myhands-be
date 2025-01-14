@@ -90,7 +90,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException  {
+    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException {
         Optional<Quest> optionalQuest = questRepository.findByFormattedName(request.getDepartmentName(), request.getJobGroup(), request.getWeekCount());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -296,7 +296,7 @@ public class QuestServiceImpl implements QuestService {
         Long userId = (Long) request.getAttribute("userId");
         User user = getUserByUserId(userId);
         List<String> challenges = getChallenges(user);
-        Integer challengeCount = challenges.size();
+        Integer challengeCount = getChallengeCount(challenges);
         Integer questRate = getQuestRate(user);
         Integer maxCount = getMaxCount(user);
         Map<String, Integer> expHistory = getExpHistory(user);
@@ -304,9 +304,20 @@ public class QuestServiceImpl implements QuestService {
         return QuestResponse.QuestStats.from(challengeCount, challenges, questRate, maxCount, historyCount, expHistory);
     }
 
+    private Integer getChallengeCount(List<String> challenges) {
+        Integer challengeCount = 0;
+        for (int i = 2; i >= 0; i--) {
+            if (challenges.get(i).equals("MIN") || challenges.get(i).equals("FAIL")) {
+                break;
+            }
+            challengeCount++;
+        }
+        return challengeCount+1;
+    }
+
     private Map<String, Integer> getExpHistory(User user) {
         int year = LocalDate.now().getYear();
-        Map<String, Integer> expHistory = new HashMap<>();
+        TreeMap<String, Integer> expHistory = new TreeMap<>();
         for (int i = 1; i <= 4; i++) {
             Integer yearExp = expService.getYearExp(user, year - i);
             expHistory.put(String.valueOf(year - i), yearExp);
@@ -348,32 +359,50 @@ public class QuestServiceImpl implements QuestService {
     }
 
     private List<String> getChallenges(User user) {
-        // TODO: 임시 값 설정
-        LocalDateTime startDate = LocalDateTime.of(2025, 2, 1, 0, 0, 0);
-        LocalDateTime endDate = startDate.withHour(23).withMinute(59).withSecond(59);
-        while (startDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            startDate = startDate.minusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        while (endDate.getDayOfWeek() != DayOfWeek.MONDAY) {
+            endDate = endDate.minusDays(1);
         }
+        LocalDateTime startDate = endDate.minusWeeks(3);
+        endDate = startDate.plusWeeks(1);
 
-        List<Quest> questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
         List<String> challenges = new ArrayList<>();
-        while (!questsBetweenDates.isEmpty()) {
+        for (int i = 0; i < 3; i++) {
+            System.out.println("startDate.toString() = " + startDate);
+            System.out.println("endDate.toString() = " + endDate);
+            List<Quest> questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+            if (questsBetweenDates.isEmpty()) {
+                challenges.add("FAIL");
+                continue;
+            }
             Quest quest = questsBetweenDates.get(0);
+            System.out.println("QuestResponse.from(quest).toString() = " + QuestResponse.from(quest).toString());
             if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
                 challenges.add("ETC");
-            } else if (quest.getQuestType().equals("leader")) {
-                if (quest.getGrade().equals("Max")) {
-                    challenges.add("MAX");
-                } else if (quest.getGrade().equals("Median")) {
-                    challenges.add("MED");
-                }
             } else {
                 challenges.add(quest.getGrade());
             }
-            endDate = startDate.minusSeconds(1);
-            startDate = startDate.minusWeeks(1);
-            questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+            startDate = startDate.plusWeeks(1);
+            endDate = endDate.plusWeeks(1);
         }
+//        List<String> challenges = new ArrayList<>();
+//        while (!questsBetweenDates.isEmpty()) {
+//            Quest quest = questsBetweenDates.get(0);
+//            if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
+//                challenges.add("ETC");
+//            } else if (quest.getQuestType().equals("leader")) {
+//                if (quest.getGrade().equals("Max")) {
+//                    challenges.add("MAX");
+//                } else if (quest.getGrade().equals("Median")) {
+//                    challenges.add("MED");
+//                }
+//            } else {
+//                challenges.add(quest.getGrade());
+//            }
+//            endDate = startDate.minusSeconds(1);
+//            startDate = startDate.minusWeeks(1);
+//            questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+//        }
         return challenges;
     }
 
