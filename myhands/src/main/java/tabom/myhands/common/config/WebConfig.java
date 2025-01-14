@@ -20,6 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/quest/leader")
                 .excludePathPatterns("/quest/company")
                 .excludePathPatterns("/quest/hr")
+                .excludePathPatterns("/google/*")
                 .excludePathPatterns("/");
     }
 }

@@ -18,9 +18,15 @@ public class AlarmController {
     private final ResponseProperties responseProperties;
     private final AlarmService alarmService;
 
-    @DeleteMapping("")
-    public ResponseEntity<MessageResponse> delete(HttpServletRequest request) {
-        alarmService.deleteAlarm((Long) request.getAttribute("userId"));
+    @DeleteMapping("/recent")
+    public ResponseEntity<MessageResponse> deleteRecent(HttpServletRequest request) {
+        alarmService.deleteRecentAlarm((Long) request.getAttribute("userId"));
+        return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
+    }
+
+    @DeleteMapping("/old")
+    public ResponseEntity<MessageResponse> deleteOld(HttpServletRequest request) {
+        alarmService.deleteOldAlarm((Long) request.getAttribute("userId"));
         return ResponseEntity.status(HttpStatus.OK).body(MessageResponse.of(HttpStatus.OK, responseProperties.getSuccess()));
     }
 

@@ -9,6 +9,7 @@ import tabom.myhands.domain.board.dto.BoardRequest;
 import tabom.myhands.domain.board.dto.BoardResponse;
 import tabom.myhands.domain.board.entity.Board;
 import tabom.myhands.domain.board.repository.BoardRepository;
+import tabom.myhands.domain.google.service.GoogleBoardService;
 import tabom.myhands.error.errorcode.BoardErrorCode;
 import tabom.myhands.error.exception.BoardApiException;
 
@@ -20,6 +21,7 @@ public class BoardServiceImpl implements BoardService{
 
     private final BoardRepository boardRepository;
     private final AlarmService alarmService;
+    private final GoogleBoardService googleBoardService;
 
     @Override
     @Transactional
@@ -34,6 +36,7 @@ public class BoardServiceImpl implements BoardService{
 
         Board board = Board.build(requestDto, userId);
         boardRepository.save(board);
+        googleBoardService.createBoardToSheet(board);
         alarmService.createBoardAlarm(board);
     }
 

@@ -22,6 +22,7 @@ import tabom.myhands.error.exception.UserApiException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -34,9 +35,18 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     @Transactional
-    public void deleteAlarm(Long userId) {
+    public void deleteRecentAlarm(Long userId) {
         User user = userRepository.findByUserId(userId).orElseThrow(()-> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
-        alarmRepository.deleteAllByUser(user);
+        LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
+        alarmRepository.deleteTodayAlarmsByUser(user,startOfDay);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOldAlarm(Long userId) {
+        User user = userRepository.findByUserId(userId).orElseThrow(()-> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        alarmRepository.deleteOldAlarms(user, startOfDay);
     }
 
     @Override
