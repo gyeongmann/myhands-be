@@ -7,7 +7,8 @@ import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.user.entity.User;
 
 public interface AlarmService {
-    void deleteAlarm(Long userId);
+    void deleteRecentAlarm(Long userId);
+    void deleteOldAlarm(Long userId);
     AlarmResponse.AlarmList getAlarmList(Long userId);
     void createBoardAlarm(Board board) throws FirebaseMessagingException;
     void createExpAlarm(User user, Quest quest, boolean updateAlarm) throws FirebaseMessagingException;
