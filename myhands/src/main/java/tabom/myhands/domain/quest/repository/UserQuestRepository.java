@@ -68,6 +68,7 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
             "WHERE uq.user = :user " +
             "AND q.completedAt >= :startDate " +
             "AND q.completedAt < :endDate " +
+            "AND q.expAmount > 0 " +
             "ORDER BY q.expAmount DESC")
     List<Quest> findQuestsBetweenDates(@Param("user") User user,
                                        @Param("startDate") LocalDateTime startDate,
