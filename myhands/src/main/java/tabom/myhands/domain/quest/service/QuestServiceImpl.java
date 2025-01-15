@@ -1,6 +1,5 @@
 package tabom.myhands.domain.quest.service;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -349,8 +348,6 @@ public class QuestServiceImpl implements QuestService {
             if (!userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).isEmpty()) {
                 currentCount++; // 완료된 퀘스트가 있으면 연속 증가
                 maxCount = Math.max(maxCount, currentCount); // 최대값 갱신
-                System.out.println("quest: " + userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).get(0));
-                System.out.println(maxCount);
             } else {
                 currentCount = 0;
             }
@@ -379,6 +376,8 @@ public class QuestServiceImpl implements QuestService {
         List<String> challenges = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             List<Quest> questsBetweenDates = userQuestRepository.findQuestsBetweenDates(user, startDate, endDate);
+            startDate = startDate.plusWeeks(1);
+            endDate = endDate.plusWeeks(1);
             if (questsBetweenDates.isEmpty()) {
                 challenges.add("FAIL");
                 continue;
@@ -389,8 +388,6 @@ public class QuestServiceImpl implements QuestService {
             } else {
                 challenges.add(quest.getGrade());
             }
-            startDate = startDate.plusWeeks(1);
-            endDate = endDate.plusWeeks(1);
         }
         return challenges;
     }
