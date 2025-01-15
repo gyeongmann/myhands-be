@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class QuestResponse {
     private Long questId;
@@ -85,6 +86,10 @@ public class QuestResponse {
         private String completedAt;
 
         public static QuestResponseTimeFormat from(Quest quest, String name, String grade, String completedAt) {
+            return new QuestResponseTimeFormat(quest.getQuestId(), quest.getQuestType(), name, grade, quest.getExpAmount(), quest.getIsCompleted(), completedAt);
+        }
+
+        public static QuestResponseTimeFormat from(QuestResponse quest, String name, String grade, String completedAt) {
             return new QuestResponseTimeFormat(quest.getQuestId(), quest.getQuestType(), name, grade, quest.getExpAmount(), quest.getIsCompleted(), completedAt);
         }
     }

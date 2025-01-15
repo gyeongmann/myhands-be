@@ -104,12 +104,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request) {
-        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
         List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
         for (UserQuest userQuest : userQuests) {
@@ -167,12 +162,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request) {
-        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
         List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         String format = String.format("%s | %s", request.getProjectName(), request.getName());
         for (UserQuest userQuest : userQuests) {
@@ -205,12 +195,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestResponse getHRQuest(QuestRequest.HRQuest request) {
-        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
         List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         String season = request.getIsFirstHalf() ? "상반기" : "하반기";
         String format = String.format("%s 인사평가 | %s", season, request.getName());
@@ -225,6 +210,15 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = createQuest(new QuestRequest.Create("hr", format));
         userQuestService.createUserQuest(new UserQuestRequest.Create(user.getUserId(), quest.getQuestId()));
         return QuestResponse.from(quest);
+    }
+
+    private User getUserByEmployeeNumAndName(Integer employeeNum, String name) {
+        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(employeeNum, name);
+        if (optionalUser.isEmpty()) {
+            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
+        }
+
+        return optionalUser.get();
     }
 
     @Override
@@ -291,9 +285,12 @@ public class QuestServiceImpl implements QuestService {
         List<QuestResponse> list = new ArrayList<>();
         for (Quest quest : questList) {
             String name = quest.getName();
-            if (name.endsWith("주차")) {
+            if (quest.getQuestType().equals("job")) {
                 name = name.substring(0, name.length() - 4);
-            } else if (name.endsWith(user.getName())) {
+            } else if (quest.getQuestType().equals("leader") || quest.getQuestType().equals("company") || quest.getQuestType().equals("hr")) {
+                if (!name.endsWith(user.getName())) {
+                    continue;
+                }
                 name = name.split(" \\|")[0];
             }
             list.add(QuestResponse.from(quest, name));
@@ -338,12 +335,11 @@ public class QuestServiceImpl implements QuestService {
     }
 
     private Integer getMaxCount(User user) {
-        // TODO: 임시 값 설정
-        LocalDateTime startDate = LocalDateTime.of(2025, 2, 1, 0, 0, 0);
-        LocalDateTime endDate = startDate.withHour(23).withMinute(59).withSecond(59);
-        while (startDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+        LocalDateTime startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        while (startDate.getDayOfWeek() != DayOfWeek.MONDAY) {
             startDate = startDate.minusDays(1);
         }
+        LocalDateTime endDate = startDate.plusWeeks(1);
 
         LocalDate joinedAt = user.getJoinedAt();
         LocalDateTime joinedDateTime = LocalDateTime.of(joinedAt.getYear(), joinedAt.getMonth(), joinedAt.getDayOfMonth(), 0, 0, 0);
@@ -353,6 +349,8 @@ public class QuestServiceImpl implements QuestService {
             if (!userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).isEmpty()) {
                 currentCount++; // 완료된 퀘스트가 있으면 연속 증가
                 maxCount = Math.max(maxCount, currentCount); // 최대값 갱신
+                System.out.println("quest: " + userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).get(0));
+                System.out.println(maxCount);
             } else {
                 currentCount = 0;
             }
