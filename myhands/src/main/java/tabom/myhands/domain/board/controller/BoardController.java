@@ -24,7 +24,7 @@ public class BoardController {
     private final ResponseProperties responseProperties;
 
     @PostMapping("/create")
-    public ResponseEntity<MessageResponse> create(HttpServletRequest request, @RequestBody BoardRequest.Create requestDto) throws FirebaseMessagingException {
+    public ResponseEntity<MessageResponse> create(HttpServletRequest request, @RequestBody BoardRequest.Create requestDto) {
         Long userId = (Long) request.getAttribute("userId");
         boolean isAdmin = (boolean) request.getAttribute("isAdmin");
         boardService.create(userId, isAdmin, requestDto);

@@ -7,7 +7,7 @@ import tabom.myhands.domain.board.dto.BoardResponse;
 import java.util.List;
 
 public interface BoardService {
-    void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto) throws FirebaseMessagingException;
+    void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto);
     void edit(Long userId, boolean isAdmin, BoardRequest.Edit requestDto);
     void delete(boolean isAdmin, Long boardId);
     BoardResponse.Detail detail(Long boardId);

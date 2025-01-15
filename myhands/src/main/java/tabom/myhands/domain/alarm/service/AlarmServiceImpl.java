@@ -74,7 +74,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     @Transactional
-    public void createBoardAlarm(Board board) throws FirebaseMessagingException {
+    public void createBoardAlarm(Board board) {
         List<User> users = userRepository.findAll();
 
         for(User user : users) {
@@ -88,7 +88,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     @Transactional
-    public void createExpAlarm(User user, Quest quest, boolean updateAlarm) throws FirebaseMessagingException {
+    public void createExpAlarm(User user, Quest quest, boolean updateAlarm) {
         Alarm alarm = Alarm.ExpAlarmCreate(user, quest);
         alarmRepository.save(alarm);
 
@@ -116,7 +116,7 @@ public class AlarmServiceImpl implements AlarmService {
         return diffMin + "분 전";
     }
 
-    public void sendMessage(User user, Alarm alarm, boolean updateAlarm) throws FirebaseMessagingException {
+    public void sendMessage(User user, Alarm alarm, boolean updateAlarm) {
         String title = "공지사항";
         String body = alarm.getTitle();
 
@@ -128,18 +128,22 @@ public class AlarmServiceImpl implements AlarmService {
             body = body + "\n" + alarm.getExp() + " do를 획득하셨습니다.";
         }
 
-        Message message = Message.builder()
-                .setToken(user.getDeviceToken())
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
-                        .build())
-                .build();
+        try {
+            Message message = Message.builder()
+                    .setToken(user.getDeviceToken())
+                    .setNotification(Notification.builder()
+                            .setTitle(title)
+                            .setBody(body)
+                            .build())
+                    .build();
 
-        String response = FirebaseMessaging.getInstance().send(message);
-        log.info(title);
-        log.info(body);
-        log.info(response);
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.info(title);
+            log.info(body);
+            log.info(response);
+        } catch (FirebaseMessagingException e) {
+            log.info(e.toString());
+        }
     }
 
 }
