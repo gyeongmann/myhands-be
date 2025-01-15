@@ -1,7 +1,10 @@
 package tabom.myhands.domain.quest.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tabom.myhands.domain.quest.dto.QuestResponse;
@@ -18,7 +21,9 @@ import tabom.myhands.domain.user.repository.UserRepository;
 import tabom.myhands.error.errorcode.UserErrorCode;
 import tabom.myhands.error.exception.UserApiException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -90,15 +95,51 @@ public class UserQuestServiceImpl implements UserQuestService {
     }
 
     @Override
-    public List<QuestResponse> getCompletedQuest(Long userId) {
-        User user = getUser(userId);
-        List<QuestResponse> completedQuests = new ArrayList<>();
-        // TODO: 임시 날짜 설정
-        List<Quest> quests = userQuestRepository.findQuestsByUserCompletedAtDESC(user, LocalDateTime.of(2025, 2, 1, 0, 0));
-        for (Quest quest : quests) {
-            completedQuests.add(QuestResponse.from(quest));
+    public QuestResponse.QuestPage getCompletedQuest(HttpServletRequest request, int page, int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Size must be greater than 0");
         }
-        return completedQuests;
+        PageRequest pageRequest = PageRequest.of(page, size);
+        User user = getUser(request);
+        Page<Quest> userQuestsPage = userQuestRepository.findAllByUserId(user, pageRequest);
+        List<QuestResponse.QuestResponseTimeFormat> quests = getQuestList(userQuestsPage.getContent(), user.getName());
+        return QuestResponse.QuestPage.from(quests, !userQuestsPage.isLast(), userQuestsPage.getTotalPages(), userQuestsPage.getTotalElements(), userQuestsPage.getNumber());
+    }
+
+    private static String calculateTimeAgo(LocalDateTime createdAt, LocalDateTime now) {
+        Duration duration = Duration.between(createdAt, now);
+
+        System.out.println("now = " + now);
+        if (duration.toSeconds() < 60) {
+            return duration.toSeconds() + "초 전";
+        } else if (duration.toMinutes() < 60) {
+            return duration.toMinutes() + "분 전";
+        } else if (duration.toHours() < 24) {
+            return duration.toHours() + "시간 전";
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+            return createdAt.format(formatter); // 그 외는 날짜로 표시
+        }
+    }
+
+    private List<QuestResponse.QuestResponseTimeFormat> getQuestList(List<Quest> quests, String userName) {
+        List<QuestResponse.QuestResponseTimeFormat> list = new ArrayList<>();
+        for (Quest quest : quests) {
+            String name = quest.getName();
+            if (name.endsWith("주차")) {
+                name = name.substring(0, name.length() - 4);
+            } else if (name.endsWith(userName)) {
+                name = name.split(" \\|")[0];
+            }
+            // TODO 임시 시간 설정
+            String timeFormat = calculateTimeAgo(quest.getCompletedAt(), LocalDateTime.now().withMonth(1).withDayOfMonth(19).withHour(0).withMinute(5).withSecond(10));
+            String grade = quest.getGrade();
+            if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
+                grade = "OTHER";
+            }
+            list.add(QuestResponse.QuestResponseTimeFormat.from(quest, name, grade, timeFormat));
+        }
+        return list;
     }
 
     private User getUser(Long userId) {
@@ -107,5 +148,18 @@ public class UserQuestServiceImpl implements UserQuestService {
             throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
         }
         return optionalUser.get();
+    }
+
+    private User getUser(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        return getUser(userId);
+    }
+
+    private Quest getQuest(Long questId) {
+        Optional<Quest> optionalQuest = questRepository.findByQuestId(questId);
+        if (optionalQuest.isEmpty()) {
+            throw new IllegalArgumentException("Quest not found");
+        }
+        return optionalQuest.get();
     }
 }

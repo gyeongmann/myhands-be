@@ -32,17 +32,16 @@ public class QuestResponse {
         );
     }
 
-    @Override
-    public String toString() {
-        return "QuestResponse{" +
-                "questId=" + questId +
-                ", questType='" + questType + '\'' +
-                ", name='" + name + '\'' +
-                ", grade='" + grade + '\'' +
-                ", expAmount=" + expAmount +
-                ", isCompleted=" + isCompleted +
-                ", completedAt=" + completedAt +
-                '}';
+    public static QuestResponse from(Quest quest, String questName) {
+        return new QuestResponse(
+                quest.getQuestId(),
+                quest.getQuestType(),
+                questName,
+                quest.getGrade(),
+                quest.getExpAmount(),
+                quest.getIsCompleted(),
+                quest.getCompletedAt()
+        );
     }
 
     @Getter
@@ -70,6 +69,38 @@ public class QuestResponse {
 
         public static QuestStats from(Integer challengeCount, List<String> resultList, Integer questRate, Integer maxCount, Integer historySize, Map<String, Integer> expHistory) {
             return new QuestStats(challengeCount, resultList, questRate, maxCount, historySize, expHistory);
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestResponseTimeFormat {
+        private Long questId;
+        private String questType;
+        private String name;
+        private String grade;
+        private Integer expAmount;
+        private Boolean isCompleted;
+        private String completedAt;
+
+        public static QuestResponseTimeFormat from(Quest quest, String name, String grade, String completedAt) {
+            return new QuestResponseTimeFormat(quest.getQuestId(), quest.getQuestType(), name, grade, quest.getExpAmount(), quest.getIsCompleted(), completedAt);
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestPage {
+        private List<QuestResponseTimeFormat> quests;
+        private Boolean hasMore;
+        private Integer totalPages;
+        private Long totalElements;
+        private Integer currentPage;
+
+        public static QuestPage from(List<QuestResponseTimeFormat> quests, Boolean hasMore, Integer totalPages, Long totalElements, Integer currentPage) {
+            return new QuestPage(quests, hasMore, totalPages, totalElements, currentPage);
         }
     }
 }

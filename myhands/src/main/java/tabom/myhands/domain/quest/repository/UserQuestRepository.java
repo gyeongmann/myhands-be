@@ -1,5 +1,6 @@
 package tabom.myhands.domain.quest.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -64,7 +65,8 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
     @Query("SELECT q FROM UserQuest uq " +
             "JOIN uq.quest q " +
             "WHERE uq.user = :user " +
-            "AND q.completedAt BETWEEN :startDate AND :endDate " +
+            "AND q.completedAt >= :startDate " +
+            "AND q.completedAt < :endDate " +
             "ORDER BY q.expAmount DESC")
     List<Quest> findQuestsBetweenDates(@Param("user") User user,
                                        @Param("startDate") LocalDateTime startDate,
@@ -86,4 +88,11 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
             "ORDER BY q.completedAt ASC")
     List<UserQuest> findCompletedQuestsByYear(@Param("user") User user, @Param("year") int year);
 
+    @Query("SELECT q FROM UserQuest uq " +
+            "JOIN uq.quest q " +
+            "WHERE uq.user = :user " +
+            // TODO 임시 시간 설정
+//            "AND q.completedAt < CURRENT_TIMESTAMP " +
+            "ORDER BY q.completedAt DESC")
+    Page<Quest> findAllByUserId(@Param("user") User user, Pageable pageable);
 }
