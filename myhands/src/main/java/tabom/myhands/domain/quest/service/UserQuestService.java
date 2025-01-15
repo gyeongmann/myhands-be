@@ -1,5 +1,6 @@
 package tabom.myhands.domain.quest.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.quest.dto.UserQuestRequest;
 import tabom.myhands.domain.quest.dto.UserQuestResponse;
@@ -19,5 +20,5 @@ public interface UserQuestService {
 
     List<QuestResponse> getQuests(Long userId);
 
-    List<QuestResponse> getCompletedQuest(Long userId);
+    QuestResponse.QuestPage getCompletedQuest(HttpServletRequest request, int page, int size);
 }

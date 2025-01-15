@@ -5,7 +5,7 @@ import tabom.myhands.domain.board.dto.BoardRequest;
 import tabom.myhands.domain.board.entity.Board;
 
 public interface GoogleBoardService {
-    void create(Long userId, BoardRequest.Edit requestDto) throws FirebaseMessagingException;
+    void create(Long userId, BoardRequest.Edit requestDto);
 
     void createBoardToSheet(Board board);
 }

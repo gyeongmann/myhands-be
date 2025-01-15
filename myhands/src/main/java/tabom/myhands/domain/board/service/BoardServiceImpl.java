@@ -25,7 +25,7 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     @Transactional
-    public void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto) throws FirebaseMessagingException {
+    public void create(Long userId, boolean isAdmin, BoardRequest.Create requestDto) {
         if(!isAdmin){
             throw new BoardApiException(BoardErrorCode.NOT_ADMIN);
         }

@@ -87,10 +87,11 @@ public class QuestController {
     }
 
     @GetMapping("/completelist")
-    public ResponseEntity<DtoResponse<List<QuestResponse>>> getCompletedQuests(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
-        List<QuestResponse> completedQuest = userQuestService.getCompletedQuest(userId);
-        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), completedQuest));
+    public ResponseEntity<DtoResponse<QuestResponse.QuestPage>> getCompletedQuests(HttpServletRequest request,
+                                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                                   @RequestParam(defaultValue = "10") int size) {
+        QuestResponse.QuestPage response = userQuestService.getCompletedQuest(request, page, size);
+        return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }
 
     @GetMapping("/company")
@@ -123,7 +124,7 @@ public class QuestController {
     }
 
     @PatchMapping("/hr")
-    public ResponseEntity<DtoResponse<QuestResponse>> updateHRQuest(@RequestBody QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException {
+    public ResponseEntity<DtoResponse<QuestResponse>> updateHRQuest(@RequestBody QuestRequest.UpdateHRQuest request) {
         QuestResponse response = questService.updateHRQuest(request);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }

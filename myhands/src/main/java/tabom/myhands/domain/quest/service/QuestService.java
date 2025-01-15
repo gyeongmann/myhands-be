@@ -21,19 +21,19 @@ public interface QuestService {
 
     QuestResponse getWeekCountJobQuest(QuestRequest.JobQuest request);
 
-    QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException;
+    QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request);
 
     QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request);
 
-    QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) throws FirebaseMessagingException;
+    QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request);
 
     QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request);
 
-    QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) throws FirebaseMessagingException;
+    QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request);
 
     QuestResponse getHRQuest(QuestRequest.HRQuest request);
 
-    QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException;
+    QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request);
 
     QuestResponse.QuestCalendar getQuestCalendar(HttpServletRequest servletRequest, QuestRequest.QuestCalendar request);
 
