@@ -95,6 +95,7 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
             "WHERE uq.user = :user " +
             "AND q.completedAt IS NOT NULL " +
             "AND q.completedAt < CURRENT_TIMESTAMP " +
+            "AND FUNCTION('YEAR', q.completedAt)  = 2025" +
             "AND q.isCompleted = true " +
             "AND q.expAmount > 0 " +
             "ORDER BY q.completedAt DESC")
