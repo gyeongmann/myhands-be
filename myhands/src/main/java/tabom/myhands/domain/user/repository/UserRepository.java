@@ -34,4 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersByDepartmentAndJobGroup(Department department, Integer jobGroup);
 
     Optional<User> findUserByEmployeeNumAndName(Integer employeeNum, String name);
+
+    Optional<User> findByGoogleId(Long googleId);
+
+    boolean existsByEmployeeNum(int employeeNum);
 }

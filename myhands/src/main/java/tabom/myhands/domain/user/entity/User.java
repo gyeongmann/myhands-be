@@ -59,6 +59,8 @@ public class User {
     @Column(name = "device_token")
     private String deviceToken;
 
+    private Long googleId;
+
     public static User build(UserRequest.Join request, Department department, String employeeNum, String level) {
 
         return User.builder()
@@ -73,6 +75,31 @@ public class User {
                 .jobGroup(request.getJobGroup())
                 .level(level)
                 .build();
+    }
+
+    public static User googleUserbuild(UserRequest.GoogleJoin request, Department department, LocalDate joinedAt) {
+
+        return User.builder()
+                .department(department)
+                .name(request.getName())
+                .id(request.getId())
+                .password(request.getPassword())
+                .employeeNum(request.getEmployeeNum())
+                .joinedAt(joinedAt)
+                .avatarId(1)
+                .exp(0)
+                .jobGroup(request.getJobGroup())
+                .level(request.getLevel())
+                .googleId(request.getGoogleId())
+                .build();
+    }
+
+    public void changeGoogleDetail(UserRequest.GoogleJoin request, Department department, LocalDate joinedAt) {
+        this.employeeNum = request.getEmployeeNum();
+        this.department = department;
+        this.jobGroup = request.getJobGroup();
+        this.name = request.getName();
+        this.joinedAt = joinedAt;
     }
 
     public void changeDeviceToken(String deviceToken) {
@@ -115,6 +142,10 @@ public class User {
         this.department = department;
         this.jobGroup = request.getJobGroup();
         this.joinedAt = request.getJoinedAt();
+    }
+
+    public void changeGoogleId(Long googleId) {
+        this.googleId = googleId;
     }
 
 }
