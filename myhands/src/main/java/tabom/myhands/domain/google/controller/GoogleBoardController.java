@@ -21,7 +21,7 @@ public class GoogleBoardController {
     private final GoogleBoardService googleBoardService;
 
     @PostMapping("")
-    public ResponseEntity<MessageResponse> create(@RequestBody BoardRequest.Edit requestDto) throws FirebaseMessagingException {
+    public ResponseEntity<MessageResponse> create(@RequestBody BoardRequest.Edit requestDto) {
         Long userId = 1L;
         googleBoardService.create(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.of(HttpStatus.CREATED, responseProperties.getSuccess()));

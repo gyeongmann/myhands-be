@@ -124,7 +124,7 @@ public class QuestController {
     }
 
     @PatchMapping("/hr")
-    public ResponseEntity<DtoResponse<QuestResponse>> updateHRQuest(@RequestBody QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException {
+    public ResponseEntity<DtoResponse<QuestResponse>> updateHRQuest(@RequestBody QuestRequest.UpdateHRQuest request) {
         QuestResponse response = questService.updateHRQuest(request);
         return ResponseEntity.ok(new DtoResponse<>(HttpStatus.OK, responseProperties.getSuccess(), response));
     }

@@ -90,7 +90,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) throws FirebaseMessagingException {
+    public QuestResponse updateWeekCountJobQuest(QuestRequest.UpdateJobQuest request) {
         Optional<Quest> optionalQuest = questRepository.findByFormattedName(request.getDepartmentName(), request.getJobGroup(), request.getWeekCount());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -126,7 +126,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) throws FirebaseMessagingException {
+    public QuestResponse updateLeaderQuest(QuestRequest.UpdateLeaderQuest request) {
         String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
         Optional<Quest> optionalQuest = questRepository.findQuestByName(formattedQuestName);
         if (optionalQuest.isEmpty()) {
@@ -189,7 +189,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) throws FirebaseMessagingException {
+    public QuestResponse updateCompanyQuest(QuestRequest.UpdateCompanyQuest request) {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -228,7 +228,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) throws FirebaseMessagingException {
+    public QuestResponse updateHRQuest(QuestRequest.UpdateHRQuest request) {
         Optional<Quest> optionalQuest = questRepository.findByQuestId(request.getQuestId());
         if (optionalQuest.isEmpty()) {
             throw new IllegalArgumentException("Quest not found");
@@ -243,7 +243,7 @@ public class QuestServiceImpl implements QuestService {
     }
 
 
-    private void updateExpAndAlarm(Quest quest) throws FirebaseMessagingException {
+    private void updateExpAndAlarm(Quest quest) {
         List<User> users = userQuestRepository.findUsersByQuestId(quest.getQuestId());
         boolean updateAlarm = false;
         int preExp = 0;
