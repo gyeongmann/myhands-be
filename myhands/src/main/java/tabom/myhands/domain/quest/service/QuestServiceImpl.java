@@ -1,6 +1,5 @@
 package tabom.myhands.domain.quest.service;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
