@@ -14,7 +14,9 @@ import tabom.myhands.error.exception.UserApiException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,8 +53,19 @@ public class GoogleUserServiceImpl implements GoogleUserService {
         }
     }
 
+    @Override
+    @Transactional
     public void createUserToSheet(User user) {
+        Long googleId = userRepository.findMaxGoogleId() + 1;
+        user.updateGoogleId(googleId);
+        userRepository.save(user);
 
+        List<List<Object>> values = new ArrayList<>();
+        String range = "참고. 구성원 정보!B" + googleId + ":I" + googleId;
+
+        List<Object> row = Arrays.asList(user.getEmployeeNum(), user.getName(), user.getJoinedAt().toString(), user.getDepartment().getName(), user.getJobGroup(), user.getLevel(), user.getId(), user.getPassword());
+        values.add(row);
+        googleService.writeToSheet(range, values);
     }
 
     public void updatePasswordToSheet(User user) {

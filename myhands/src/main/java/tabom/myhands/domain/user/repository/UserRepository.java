@@ -38,4 +38,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByGoogleId(Long googleId);
 
     boolean existsByEmployeeNum(int employeeNum);
+
+    @Query("SELECT MAX(u.googleId) FROM User u WHERE u.googleId IS NOT NULL")
+    Long findMaxGoogleId();
 }

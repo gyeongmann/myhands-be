@@ -94,6 +94,10 @@ public class User {
                 .build();
     }
 
+    public void updateGoogleId(Long googleId) {
+        this.googleId = googleId;
+    }
+
     public void changeGoogleDetail(UserRequest.GoogleJoin request, Department department, LocalDate joinedAt) {
         this.employeeNum = request.getEmployeeNum();
         this.department = department;
