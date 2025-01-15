@@ -335,12 +335,11 @@ public class QuestServiceImpl implements QuestService {
     }
 
     private Integer getMaxCount(User user) {
-        // TODO: 임시 값 설정
-        LocalDateTime startDate = LocalDateTime.of(2025, 2, 1, 0, 0, 0);
-        LocalDateTime endDate = startDate.withHour(23).withMinute(59).withSecond(59);
-        while (startDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+        LocalDateTime startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        while (startDate.getDayOfWeek() != DayOfWeek.MONDAY) {
             startDate = startDate.minusDays(1);
         }
+        LocalDateTime endDate = startDate.plusWeeks(1);
 
         LocalDate joinedAt = user.getJoinedAt();
         LocalDateTime joinedDateTime = LocalDateTime.of(joinedAt.getYear(), joinedAt.getMonth(), joinedAt.getDayOfMonth(), 0, 0, 0);
@@ -350,6 +349,8 @@ public class QuestServiceImpl implements QuestService {
             if (!userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).isEmpty()) {
                 currentCount++; // 완료된 퀘스트가 있으면 연속 증가
                 maxCount = Math.max(maxCount, currentCount); // 최대값 갱신
+                System.out.println("quest: " + userQuestRepository.findQuestsBetweenDates(user, startDate, endDate).get(0));
+                System.out.println(maxCount);
             } else {
                 currentCount = 0;
             }
