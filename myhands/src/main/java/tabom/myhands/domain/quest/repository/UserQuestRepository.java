@@ -50,6 +50,7 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
             "WHERE uq.user = :user " +
             "AND q.expAmount > 0 " +
             "AND q.isCompleted = true " +
+            "AND q.completedAt IS NOT NULL " +
             "AND q.completedAt < CURRENT_TIMESTAMP " +
             "ORDER BY q.completedAt DESC")
     List<UserQuest> findMostRecentCompletedQuest(@Param("user") User user, Pageable pageable);
@@ -91,8 +92,10 @@ public interface UserQuestRepository extends CrudRepository<UserQuest, Long> {
     @Query("SELECT q FROM UserQuest uq " +
             "JOIN uq.quest q " +
             "WHERE uq.user = :user " +
-            // TODO 임시 시간 설정
-//            "AND q.completedAt < CURRENT_TIMESTAMP " +
+            "AND q.completedAt IS NOT NULL " +
+            "AND q.completedAt < CURRENT_TIMESTAMP " +
+            "AND q.isCompleted = true " +
+            "AND q.expAmount > 0 " +
             "ORDER BY q.completedAt DESC")
     Page<Quest> findAllByUserId(@Param("user") User user, Pageable pageable);
 }

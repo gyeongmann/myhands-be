@@ -285,9 +285,12 @@ public class QuestServiceImpl implements QuestService {
         List<QuestResponse> list = new ArrayList<>();
         for (Quest quest : questList) {
             String name = quest.getName();
-            if (name.endsWith("주차")) {
+            if (quest.getQuestType().equals("job")) {
                 name = name.substring(0, name.length() - 4);
-            } else if (name.endsWith(user.getName())) {
+            } else if (quest.getQuestType().equals("leader") || quest.getQuestType().equals("company") || quest.getQuestType().equals("hr")) {
+                if (!name.endsWith(user.getName())) {
+                    continue;
+                }
                 name = name.split(" \\|")[0];
             }
             list.add(QuestResponse.from(quest, name));

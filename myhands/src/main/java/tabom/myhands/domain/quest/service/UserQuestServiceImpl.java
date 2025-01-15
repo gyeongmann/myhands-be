@@ -126,17 +126,28 @@ public class UserQuestServiceImpl implements UserQuestService {
         List<QuestResponse.QuestResponseTimeFormat> list = new ArrayList<>();
         for (Quest quest : quests) {
             String name = quest.getName();
-            if (name.endsWith("주차")) {
+            if (quest.getQuestType().equals("job")) {
                 name = name.substring(0, name.length() - 4);
-            } else if (name.endsWith(userName)) {
+            } else if (quest.getQuestType().equals("leader") || quest.getQuestType().equals("company") || quest.getQuestType().equals("hr")) {
+                if (!name.endsWith(userName)) {
+                    continue;
+                }
                 name = name.split(" \\|")[0];
             }
-            // TODO 임시 시간 설정
-            String timeFormat = calculateTimeAgo(quest.getCompletedAt(), LocalDateTime.now().withMonth(1).withDayOfMonth(19).withHour(0).withMinute(5).withSecond(10));
-            String grade = quest.getGrade();
+
+            String grade;
+            try {
+                grade = quest.getGrade();
+            } catch (NullPointerException e) {
+                grade = "OTHER";
+            }
             if (quest.getQuestType().equals("hr") || quest.getQuestType().equals("company")) {
                 grade = "OTHER";
             }
+            if (grade.equals("MIN")) {
+                continue;
+            }
+            String timeFormat = calculateTimeAgo(quest.getCompletedAt(), LocalDateTime.now());
             list.add(QuestResponse.QuestResponseTimeFormat.from(quest, name, grade, timeFormat));
         }
         return list;
