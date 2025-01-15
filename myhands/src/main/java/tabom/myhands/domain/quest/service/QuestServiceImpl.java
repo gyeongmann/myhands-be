@@ -104,12 +104,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestResponse getLeaderQuest(QuestRequest.LeaderQuest request) {
-        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
         List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         String formattedQuestName = String.format("%d월 %s | %s", request.getMonth(), request.getQuestName(), request.getName());
         for (UserQuest userQuest : userQuests) {
@@ -167,12 +162,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestResponse getCompanyQuest(QuestRequest.CompanyQuest request) {
-        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
         List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         String format = String.format("%s | %s", request.getProjectName(), request.getName());
         for (UserQuest userQuest : userQuests) {
@@ -205,12 +195,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestResponse getHRQuest(QuestRequest.HRQuest request) {
-        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = getUserByEmployeeNumAndName(request.getEmployeeNum(), request.getName());
         List<UserQuest> userQuests = userQuestRepository.findByUserWithQuest(user);
         String season = request.getIsFirstHalf() ? "상반기" : "하반기";
         String format = String.format("%s 인사평가 | %s", season, request.getName());
@@ -225,6 +210,15 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = createQuest(new QuestRequest.Create("hr", format));
         userQuestService.createUserQuest(new UserQuestRequest.Create(user.getUserId(), quest.getQuestId()));
         return QuestResponse.from(quest);
+    }
+
+    private User getUserByEmployeeNumAndName(Integer employeeNum, String name) {
+        Optional<User> optionalUser = userRepository.findUserByEmployeeNumAndName(employeeNum, name);
+        if (optionalUser.isEmpty()) {
+            throw new UserApiException(UserErrorCode.USER_ID_NOT_FOUND);
+        }
+
+        return optionalUser.get();
     }
 
     @Override
