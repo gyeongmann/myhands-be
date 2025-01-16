@@ -36,7 +36,7 @@ public class Board {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
-    @Column(name = "google_id")
+    @Column(name = "google_id", unique = true)
     private Long googleId;
 
     public static Board build(BoardRequest.Create request, Long userId) {

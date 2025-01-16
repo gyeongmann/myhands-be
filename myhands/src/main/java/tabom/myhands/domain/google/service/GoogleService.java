@@ -3,7 +3,8 @@ package tabom.myhands.domain.google.service;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
+import com.google.api.services.sheets.v4.model.ClearValuesRequest;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -42,11 +43,16 @@ public class GoogleService {
 
     public void writeToSheet(String range, List<List<Object>> values) {
         try {
-            Sheets service = getSheetsService();
-            ValueRange body = new ValueRange().setValues(values);
-            AppendValuesResponse result = service.spreadsheets()
+            sheetsService = getSheetsService();
+            ClearValuesRequest clearRequest = new ClearValuesRequest();
+            sheetsService.spreadsheets().values()
+                    .clear(SPREADSHEET_ID, range, clearRequest)
+                    .execute();
+
+            ValueRange body = new ValueRange().setValues(values).setMajorDimension("ROWS");
+            UpdateValuesResponse result = sheetsService.spreadsheets()
                     .values()
-                    .append(SPREADSHEET_ID, range, body)
+                    .update(SPREADSHEET_ID, range, body)
                     .setValueInputOption("USER_ENTERED")
                     .setIncludeValuesInResponse(true)
                     .execute();

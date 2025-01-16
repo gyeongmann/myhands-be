@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import tabom.myhands.common.infra.redis.RedisService;
 import tabom.myhands.common.jwt.JwtTokenProvider;
 import tabom.myhands.domain.fortune.service.FortuneService;
+import tabom.myhands.domain.google.service.GoogleUserService;
+import tabom.myhands.domain.quest.entity.Quest;
+import tabom.myhands.domain.quest.entity.UserQuest;
 import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.quest.repository.QuestRepository;
 import tabom.myhands.domain.quest.repository.UserQuestRepository;
 import tabom.myhands.domain.quest.service.ExpService;
-import tabom.myhands.domain.quest.service.QuestService;
 import tabom.myhands.domain.user.dto.UserRequest;
 import tabom.myhands.domain.user.dto.UserResponse;
 import tabom.myhands.domain.user.entity.Admin;
@@ -49,10 +51,9 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final FortuneService fortuneService;
-    private final QuestService questService;
-    private final QuestRepository questRepository;
     private final UserQuestRepository userQuestRepository;
     private final ExpService expService;
+    private final GoogleUserService googleUserService;
 
     @Transactional
     @Override
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserService {
 
         User user = User.build(request, department, employeeNum, level);
         userRepository.save(user);
+        googleUserService.createUserToSheet(user);
     }
 
     @Override
@@ -130,6 +132,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
         user.changePassword(requestDto.getPassword());
         userRepository.save(user);
+        googleUserService.updatePasswordToSheet(user);
     }
 
     @Override
@@ -183,6 +186,7 @@ public class UserServiceImpl implements UserService {
 
         user.changeDetail(requestDto, department);
         userRepository.save(user);
+        googleUserService.updateUserToSheet(user);
     }
 
     @Override
