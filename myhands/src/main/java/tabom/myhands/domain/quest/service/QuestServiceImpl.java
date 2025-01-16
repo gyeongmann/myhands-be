@@ -270,7 +270,7 @@ public class QuestServiceImpl implements QuestService {
             list.add(QuestResponse.from(quest, name));
         }
 
-        return groupQuestsByWeekStartingSunday(list, request.getMonth());
+        return groupQuestsByWeekStartingSunday(list, request.getYear(), request.getMonth());
     }
 
     @Override
@@ -292,8 +292,7 @@ public class QuestServiceImpl implements QuestService {
             }
             list.add(QuestResponse.from(quest, name));
         }
-
-        return groupQuestsByWeekStartingSunday(list, month);
+        return groupQuestsByWeekStartingSunday(list, year, month);
     }
 
     @Override
@@ -399,13 +398,13 @@ public class QuestServiceImpl implements QuestService {
         return optionalUser.get();
     }
 
-    private QuestResponse.QuestCalendar groupQuestsByWeekStartingSunday(List<QuestResponse> quests, Integer month) {
+    private QuestResponse.QuestCalendar groupQuestsByWeekStartingSunday(List<QuestResponse> quests, Integer year, Integer month) {
         // 정렬된 리스트를 반환하기 위한 Map
         List<QuestResponse>[] result;
 
         // 첫 번째 일요일을 기준으로 주차 구분
-        LocalDate startDate = LocalDate.of(2025, month, 1); // 예시: 2025년 1월 1일을 시작일로 설정
-        LocalDate firstSunday = getFirstSundayOfMonth(startDate); // 해당 월의 첫 번째 일요일 구하기
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate firstSunday = getFirstSundayOfMonth(startDate);
 
         // 첫 번째 일요일 이후 매 주 일요일 날짜 구하기
         List<LocalDate> sundayDates = getSundayDates(firstSunday);
