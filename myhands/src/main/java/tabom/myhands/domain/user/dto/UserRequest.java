@@ -26,6 +26,21 @@ public class UserRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class GoogleJoin {
+        private Long googleId;
+        private int employeeNum;
+        private String name;
+        private String joinedAt;
+        private String department;
+        private Integer jobGroup;
+        private String level;
+        private String id;
+        private String password;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Login{
         private String id;
         private String password;

@@ -34,4 +34,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersByDepartmentAndJobGroup(Department department, Integer jobGroup);
 
     Optional<User> findUserByEmployeeNumAndName(Integer employeeNum, String name);
+
+    Optional<User> findByGoogleId(Long googleId);
+
+    boolean existsByEmployeeNum(int employeeNum);
+
+    @Query("SELECT MAX(u.googleId) FROM User u WHERE u.googleId IS NOT NULL")
+    Long findMaxGoogleId();
 }
