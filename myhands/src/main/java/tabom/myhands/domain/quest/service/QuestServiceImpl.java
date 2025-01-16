@@ -228,9 +228,7 @@ public class QuestServiceImpl implements QuestService {
         }
 
         Quest quest = optionalQuest.get();
-        Integer month = request.getIsFirstHalf() ? 1 : 6;
-        LocalDateTime completedAt = LocalDateTime.of(2025, month, 30, 0, 0);
-        quest.update(request.getGrade(), request.getExpAmount(), true, completedAt);
+        quest.update(request.getGrade(), request.getExpAmount(), true, LocalDateTime.now());
         updateExpAndAlarm(quest);
         return QuestResponse.from(quest);
     }
