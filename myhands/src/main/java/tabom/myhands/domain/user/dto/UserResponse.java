@@ -5,11 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tabom.myhands.domain.quest.entity.Quest;
+import tabom.myhands.domain.quest.dto.QuestResponse;
 import tabom.myhands.domain.user.entity.User;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class UserResponse {
 
@@ -166,10 +165,10 @@ public class UserResponse {
             private String grade;
             private Integer expAmount;
             private Boolean isCompleted;
-            private LocalDateTime completedAt;
+            private String completedAt;
 
-            public static RecentExp build(Quest quest) {
-                return new RecentExp(quest.getQuestId(), quest.getQuestType(), quest.getName(), quest.getGrade(), quest.getExpAmount(), quest.getIsCompleted(), quest.getCompletedAt());
+            public static RecentExp build(QuestResponse quest, String name, String grade, String completedAt) {
+                return new RecentExp(quest.getQuestId(), quest.getQuestType(), name, grade, quest.getExpAmount(), quest.getIsCompleted(), completedAt);
             }
         }
 

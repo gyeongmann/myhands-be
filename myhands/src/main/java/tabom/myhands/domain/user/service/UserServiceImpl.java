@@ -3,6 +3,7 @@ package tabom.myhands.domain.user.service;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,9 @@ import tabom.myhands.domain.fortune.service.FortuneService;
 import tabom.myhands.domain.google.service.GoogleUserService;
 import tabom.myhands.domain.quest.entity.Quest;
 import tabom.myhands.domain.quest.entity.UserQuest;
+import tabom.myhands.domain.quest.dto.QuestResponse;
+import tabom.myhands.domain.quest.entity.Quest;
+import tabom.myhands.domain.quest.repository.QuestRepository;
 import tabom.myhands.domain.quest.repository.UserQuestRepository;
 import tabom.myhands.domain.quest.service.ExpService;
 import tabom.myhands.domain.user.dto.UserRequest;
@@ -27,6 +31,7 @@ import tabom.myhands.error.errorcode.UserErrorCode;
 import tabom.myhands.error.exception.BoardApiException;
 import tabom.myhands.error.exception.UserApiException;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -258,13 +263,52 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponse.MyPageResponse.RecentExp getRecentExp(User user) {
-        List<UserQuest> recentExpList = userQuestRepository.findMostRecentCompletedQuest(user, PageRequest.of(0, 1));
-        if (recentExpList.isEmpty()) {
+        Page<Quest> recentExp = userQuestRepository.findAllByUserId(user, PageRequest.of(0, 1));
+        List<Quest> questList = recentExp.getContent();
+        if (questList.isEmpty()) {
             return new UserResponse.MyPageResponse.RecentExp();
         }
-        UserQuest userQuest = recentExpList.get(0);
-        Quest quest = userQuest.getQuest();
-        return UserResponse.MyPageResponse.RecentExp.build(quest);
+        QuestResponse response = new QuestResponse();
+        String name = "";
+        String grade = "";
+        for (Quest quest : questList) {
+            name = quest.getName();
+            if (quest.getQuestType().equals("job")) {
+                name = name.substring(0, name.length() - 4);
+            } else if (quest.getQuestType().equals("leader") || quest.getQuestType().equals("company") || quest.getQuestType().equals("hr")) {
+                if (!name.endsWith(user.getName())) {
+                    continue;
+                }
+                name = name.split(" \\|")[0];
+            }
+            response = QuestResponse.from(quest, name);
+            break;
+        }
+
+        if (response.getQuestId() == null) {
+            return new UserResponse.MyPageResponse.RecentExp();
+        }
+        if (response.getQuestType().equals("hr") || response.getQuestType().equals("company")) {
+            grade = "OTHER";
+        }
+        String completedAt = calculateTimeAgo(response.getCompletedAt(), LocalDateTime.now());
+        return UserResponse.MyPageResponse.RecentExp.build(response, name, grade, completedAt);
+    }
+
+    private static String calculateTimeAgo(LocalDateTime createdAt, LocalDateTime now) {
+        Duration duration = Duration.between(createdAt, now);
+
+        System.out.println("now = " + now);
+        if (duration.toSeconds() < 60) {
+            return duration.toSeconds() + "초 전";
+        } else if (duration.toMinutes() < 60) {
+            return duration.toMinutes() + "분 전";
+        } else if (duration.toHours() < 24) {
+            return duration.toHours() + "시간 전";
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+            return createdAt.format(formatter); // 그 외는 날짜로 표시
+        }
     }
 
     private UserResponse.MyPageResponse.ThisYearExp getThisYearExp(User user) {
