@@ -68,7 +68,27 @@ public class GoogleUserServiceImpl implements GoogleUserService {
         googleService.writeToSheet(range, values);
     }
 
-    public void updatePasswordToSheet(User user) {
+    @Override
+    public void updateUserToSheet(User user) {
+        if(user.getGoogleId() != null) {
+            List<List<Object>> values = new ArrayList<>();
+            String range = "참고. 구성원 정보!B" + user.getGoogleId() + ":F" + user.getGoogleId();
 
+            List<Object> row = Arrays.asList(user.getEmployeeNum(), user.getName(), user.getJoinedAt().toString(), user.getDepartment().getName(), user.getJobGroup());
+            values.add(row);
+            googleService.writeToSheet(range, values);
+        }
+    }
+
+    @Override
+    public void updatePasswordToSheet(User user) {
+        if(user.getGoogleId() != null) {
+            List<List<Object>> values = new ArrayList<>();
+            String range = "참고. 구성원 정보!J" + user.getGoogleId();
+
+            List<Object> row = Arrays.asList(user.getPassword());
+            values.add(row);
+            googleService.writeToSheet(range, values);
+        }
     }
 }

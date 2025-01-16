@@ -127,6 +127,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserApiException(UserErrorCode.USER_ID_NOT_FOUND));
         user.changePassword(requestDto.getPassword());
         userRepository.save(user);
+        googleUserService.updatePasswordToSheet(user);
     }
 
     @Override
@@ -180,6 +181,7 @@ public class UserServiceImpl implements UserService {
 
         user.changeDetail(requestDto, department);
         userRepository.save(user);
+        googleUserService.updateUserToSheet(user);
     }
 
     @Override

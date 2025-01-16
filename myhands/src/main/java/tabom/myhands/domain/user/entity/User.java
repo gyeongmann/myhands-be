@@ -59,6 +59,7 @@ public class User {
     @Column(name = "device_token")
     private String deviceToken;
 
+    @Column(name = "google_id", unique = true)
     private Long googleId;
 
     public static User build(UserRequest.Join request, Department department, String employeeNum, String level) {
