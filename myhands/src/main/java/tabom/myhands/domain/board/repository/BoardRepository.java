@@ -11,7 +11,8 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findByBoardId(Long id);
 
-    Optional<Board> findByGoogleId(Long id);
+    @Query("SELECT b FROM Board b WHERE b.googleId = :googleId ORDER BY b.createdAt DESC")
+    List<Board> findByGoogleIdOrderByCreatedAtDesc(@Param("googleId") Long googleId);
 
     @Query(value = "SELECT * FROM board ORDER BY created_at DESC LIMIT :size", nativeQuery = true)
     List<Board> findFirstPage(@Param("size") int size);

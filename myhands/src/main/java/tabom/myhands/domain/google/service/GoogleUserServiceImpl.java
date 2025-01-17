@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class GoogleUserServiceImpl implements GoogleUserService {
     @Override
     @Transactional
     public void createUser(UserRequest.GoogleJoin request) {
-        Optional<User> opUser = userRepository.findByGoogleId(request.getGoogleId());
+        List<User> users = userRepository.findByGoogleIdOrderByEmployeeNumDesc(request.getGoogleId());
         Department department = departmentRepository.findDepartmentByName(request.getDepartment())
                 .orElseThrow(() -> new UserApiException(UserErrorCode.INVALID_DEPARTMENT_VALUE));
         String joinedAt = request.getJoinedAt();
@@ -39,8 +38,8 @@ public class GoogleUserServiceImpl implements GoogleUserService {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         joinedAtDate = LocalDate.parse(joinedAt, formatter);
 
-        if(opUser.isPresent()) {
-            User user = opUser.get();
+        if(users.size() > 0) {
+            User user = users.get(0);
             user.changeGoogleDetail(request, department, joinedAtDate);
             userRepository.save(user);
         } else {
