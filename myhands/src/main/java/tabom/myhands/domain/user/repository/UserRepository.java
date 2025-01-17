@@ -35,7 +35,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findUserByEmployeeNumAndName(Integer employeeNum, String name);
 
-    Optional<User> findByGoogleId(Long googleId);
+    @Query("SELECT u FROM User u WHERE u.googleId = :googleId ORDER BY u.employeeNum DESC")
+    List<User> findByGoogleIdOrderByEmployeeNumDesc(@Param("googleId") Long googleId);
 
     boolean existsByEmployeeNum(int employeeNum);
 

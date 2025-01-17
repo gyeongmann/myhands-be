@@ -1,8 +1,5 @@
 package tabom.myhands.domain.google.service;
 
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,15 +10,7 @@ import tabom.myhands.domain.board.entity.Board;
 import tabom.myhands.domain.board.repository.BoardRepository;
 import tabom.myhands.error.errorcode.BoardErrorCode;
 import tabom.myhands.error.exception.BoardApiException;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.GoogleCredentials;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
 
@@ -41,9 +30,9 @@ public class GoogleBoardServiceImpl implements GoogleBoardService {
             throw new BoardApiException(BoardErrorCode.TITLE_OR_CONTENT_MISSING);
         }
 
-        Optional<Board> opBoard = boardRepository.findByGoogleId(requestDto.getBoardId());
-        if(opBoard.isPresent()) {
-            Board board = opBoard.get();
+        List<Board> boards = boardRepository.findByGoogleIdOrderByCreatedAtDesc(requestDto.getBoardId());
+        if(boards.size() > 0) {
+            Board board = boards.get(0);
             board.edit(requestDto);
             boardRepository.save(board);
         } else {
