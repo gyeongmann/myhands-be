@@ -41,9 +41,9 @@ public class GoogleBoardServiceImpl implements GoogleBoardService {
             throw new BoardApiException(BoardErrorCode.TITLE_OR_CONTENT_MISSING);
         }
 
-        Optional<Board> opBoard = boardRepository.findByGoogleId(requestDto.getBoardId());
-        if(opBoard.isPresent()) {
-            Board board = opBoard.get();
+        List<Board> boards = boardRepository.findByGoogleIdOrderByCreatedAtDesc(requestDto.getBoardId());
+        if(boards.size() > 0) {
+            Board board = boards.get(0);
             board.edit(requestDto);
             boardRepository.save(board);
         } else {

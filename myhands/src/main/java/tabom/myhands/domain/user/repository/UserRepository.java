@@ -3,6 +3,7 @@ package tabom.myhands.domain.user.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import tabom.myhands.domain.board.entity.Board;
 import tabom.myhands.domain.user.entity.Department;
 import tabom.myhands.domain.user.entity.User;
 
@@ -35,7 +36,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findUserByEmployeeNumAndName(Integer employeeNum, String name);
 
-    Optional<User> findByGoogleId(Long googleId);
+    @Query("SELECT u FROM User u WHERE u.googleId = :googleId ORDER BY u.employeeNum DESC")
+    List<User> findByGoogleIdOrderByEmployeeNumDesc(@Param("googleId") Long googleId);
 
     boolean existsByEmployeeNum(int employeeNum);
 
