@@ -48,7 +48,7 @@ public class GoogleBoardServiceImpl implements GoogleBoardService {
         boardRepository.save(board);
 
         List<List<Object>> values = new ArrayList<>();
-        String range = "참고. 게시판!B" + (googleId + 6) + ":D" + (googleId + 6);  // 데이터를 삽입할 범위
+        String range = "게시판!B" + (googleId + 6) + ":D" + (googleId + 6);  // 데이터를 삽입할 범위
         List<Object> row = Arrays.asList(googleId, board.getTitle(), board.getContent());  // 각 셀에 들어갈 값
         values.add(row);
         googleService.writeToSheet(range, values);
