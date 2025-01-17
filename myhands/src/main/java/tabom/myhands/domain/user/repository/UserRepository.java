@@ -3,7 +3,6 @@ package tabom.myhands.domain.user.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import tabom.myhands.domain.board.entity.Board;
 import tabom.myhands.domain.user.entity.Department;
 import tabom.myhands.domain.user.entity.User;
 
