@@ -60,7 +60,7 @@ public class GoogleUserServiceImpl implements GoogleUserService {
         userRepository.save(user);
 
         List<List<Object>> values = new ArrayList<>();
-        String range = "참고. 구성원 정보!B" + googleId + ":I" + googleId;
+        String range = "구성원 정보!B" + googleId + ":I" + googleId;
 
         List<Object> row = Arrays.asList(user.getEmployeeNum(), user.getName(), user.getJoinedAt().toString(), user.getDepartment().getName(), user.getJobGroup(), user.getLevel(), user.getId(), user.getPassword());
         values.add(row);
@@ -71,7 +71,7 @@ public class GoogleUserServiceImpl implements GoogleUserService {
     public void updateUserToSheet(User user) {
         if(user.getGoogleId() != null) {
             List<List<Object>> values = new ArrayList<>();
-            String range = "참고. 구성원 정보!B" + user.getGoogleId() + ":F" + user.getGoogleId();
+            String range = "구성원 정보!B" + user.getGoogleId() + ":F" + user.getGoogleId();
 
             List<Object> row = Arrays.asList(user.getEmployeeNum(), user.getName(), user.getJoinedAt().toString(), user.getDepartment().getName(), user.getJobGroup());
             values.add(row);
@@ -83,7 +83,7 @@ public class GoogleUserServiceImpl implements GoogleUserService {
     public void updatePasswordToSheet(User user) {
         if(user.getGoogleId() != null) {
             List<List<Object>> values = new ArrayList<>();
-            String range = "참고. 구성원 정보!J" + user.getGoogleId();
+            String range = "구성원 정보!J" + user.getGoogleId();
 
             List<Object> row = Arrays.asList(user.getPassword());
             values.add(row);
