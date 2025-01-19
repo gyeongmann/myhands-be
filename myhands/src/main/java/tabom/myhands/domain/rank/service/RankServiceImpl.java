@@ -32,14 +32,17 @@ public class RankServiceImpl implements RankService {
 
         List<Object[]> results = departmentRepository.countUsersByDepartment();
         List<RankResponse.CreateRank> rankList = new ArrayList<>();
+        int[][] recordUserAndExp = new int[results.size() + 1][results.size() + 1];
 
         for (Object[] result : results) {
             int departmentId = (Integer) result[0];
             int userCount = ((Long) result[1]).intValue();
+            recordUserAndExp[departmentId][0] = userCount;
             String getExp = redisService.getStringValue("department:" + departmentId + ":exp");
-            System.out.println(getExp);
+
             int totalExp = getExp == null ? 0 : Integer.parseInt(getExp);
             int expAvg = userCount == 0 ? 0 : totalExp / userCount;
+            recordUserAndExp[departmentId][1] = totalExp;
 
             if(departmentId == userDepartmentId) {
                 myTotalExp = totalExp;
@@ -81,8 +84,7 @@ public class RankServiceImpl implements RankService {
         int needExp = 0;
         if(myIndex > 0) {
             int preDepartmentId = rankList.get(myIndex - 1).getDepartmentId();
-            int preExp = Integer.parseInt(redisService.getStringValue("department:" + preDepartmentId + ":exp"));
-            needExp = preExp - myTotalExp;
+            needExp = recordUserAndExp[preDepartmentId][1] * recordUserAndExp[userDepartmentId][0] / recordUserAndExp[preDepartmentId][0] - recordUserAndExp[userDepartmentId][1];
         }
 
         return RankResponse.RankList.build(myIndex, needExp, rankList);
