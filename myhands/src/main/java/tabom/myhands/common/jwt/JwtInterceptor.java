@@ -17,7 +17,6 @@ import tabom.myhands.error.exception.UserApiException;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-
 public class JwtInterceptor implements HandlerInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -26,6 +25,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String authorizationHeader = request.getHeader("Authorization");
+        log.info(getIp(request));
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new AuthApiException(AuthErrorCode.INVALID_AUTH_HEADER);
@@ -56,5 +56,31 @@ public class JwtInterceptor implements HandlerInterceptor {
             log.error("JWT Authentication failed: {}", e.getMessage());
             throw e;
         }
+    }
+
+    private String getIp(HttpServletRequest request) {
+        String ret = null;
+
+        ret = request.getHeader("X-Forwarded-For");
+        if (ret== null) {
+            ret = request.getHeader("Proxy-Client-IP");
+        }
+        if (ret == null) {
+            ret = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ret == null) {
+            ret = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ret == null) {
+            ret = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ret == null) {
+            ret = request.getRemoteAddr();
+        }
+        if (ret != null && ret.contains(",")) {
+            ret = ret.split(",")[0].trim();
+        }
+
+        return ret;
     }
 }
