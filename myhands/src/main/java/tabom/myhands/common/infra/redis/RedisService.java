@@ -50,7 +50,7 @@ public class RedisService {
 
         valueOps.set(key, String.valueOf(totalExp));
     }
-/*
+
     @Scheduled(cron = "0 0 0 ? * MON", zone = "Asia/Seoul")
     private void resetWeeklyDepartmentExp() {
         Set<String> keys = redisTemplate.keys("department:*:exp");
@@ -62,5 +62,4 @@ public class RedisService {
         }
     }
 
- */
 }
